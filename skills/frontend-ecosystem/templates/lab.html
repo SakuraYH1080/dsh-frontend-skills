@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>frontend-ecosystem · 多层协作实验台</title>
+<style>
+  :root {
+    /* 源码语义：a = max(0.10, 0.25 - glassAlpha/100 * 0.15) */
+    --glass-alpha: 0.22;
+    --glass-blur: 16px;
+    --glass-fidelity: 1;
+    --floor-light: 0.45;
+    --floor-dark: 0.59;
+    --paper: #f7f4ec;
+    --ink: #17181c;
+    --muted: #5d6068;
+    --line: rgba(23, 24, 28, 0.12);
+    --accent: #b8542a;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font: 15px/1.65 -apple-system, "Segoe UI", "Noto Sans SC", system-ui, sans-serif;
+    color: var(--ink);
+    background: #101318;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  /* ── 场景层：唯一有效画面的容器 ── */
+  .stage {
+    position: relative;
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #0d1017;
+    isolation: isolate;
+  }
+  .stage-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 420ms cubic-bezier(.22, .61, .36, 1);
+    will-change: opacity;
+  }
+  .stage-layer[data-state="live"] { opacity: 1; }
+  .stage-layer[data-state="held"] { opacity: 1; z-index: 1; }
+  .stage-layer[data-state="fading"] { opacity: 1; z-index: 2; }
+  .stage-layer[data-state="dead"] { opacity: 0; z-index: 0; }
+
+  .scene-a { background: radial-gradient(120% 90% at 20% 10%, #2b3a52 0%, #16202f 55%, #0b0f16 100%); }
+  .scene-b { background: radial-gradient(110% 80% at 80% 20%, #6d4230 0%, #33201b 60%, #120d0c 100%); }
+  .scene-c { background: radial-gradient(100% 80% at 50% 100%, #4a4f38 0%, #21241c 60%, #0f110d 100%); }
+  .scene-poster {
+    background: repeating-linear-gradient(45deg, #1a1d25 0 10px, #14171e 10px 20px);
+  }
+
+  .stage-hud {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    z-index: 6;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .stage-hud button {
+    border: 1px solid rgba(255, 255, 255, .22);
+    background: rgba(12, 15, 21, .55);
+    color: #eef1f7;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12.5px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .stage-hud button[aria-pressed="true"] { background: rgba(238, 241, 247, .92); color: #13161d; }
+
+  /* 场景状态条：暂停 / 加载 / 失败必须可区分 */
+  .stage-status {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    z-index: 6;
+    max-width: 78%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    color: #eef1f7;
+    background: rgba(12, 15, 21, .62);
+    border: 1px solid rgba(255, 255, 255, .16);
+    backdrop-filter: blur(10px);
+  }
+  .stage-status .dot { width: 7px; height: 7px; border-radius: 50%; background: #7f8697; }
+  .stage-status[data-kind="loading"] .dot { background: #d6a13f; }
+  .stage-status[data-kind="paused"] .dot { background: #7f8697; }
+  .stage-status[data-kind="failed"] .dot { background: #cf5a4a; }
+  .stage-status[data-kind="ready"] .dot { background: #5aa06a; }
+
+  /* ── 表面层：玻璃只承担区域秩序 ── */
+  .workspace {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px;
+    gap: 14px;
+    padding: 60px 18px 60px 18px;
+    pointer-events: none;
+  }
+  .reading {
+    pointer-events: auto;
+    max-width: 62ch;
+    border-radius: 14px;
+    padding: 22px 24px;
+    overflow: auto;
+    /* 阅读面：稳定底色 + 玻璃只做轻量透光 */
+    background:
+      linear-gradient(rgba(247, 244, 236, calc(0.94 - var(--glass-fidelity) * 0.10)), rgba(247, 244, 236, calc(0.90 - var(--glass-fidelity) * 0.08)));
+    border: 1px solid rgba(255, 255, 255, calc(0.35 * var(--glass-fidelity)));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .5);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.3) brightness(1.04);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3) brightness(1.04);
+  }
+  .reading h1 { font-size: 21px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .reading .meta { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+  .reading p { margin: 0 0 12px; }
+  .reading p:last-child { margin-bottom: 0; }
+  .reading .controls { display: flex; gap: 8px; margin-top: 16px; }
+
+  .toolrail {
+    pointer-events: auto;
+    align-self: start;
+    display: grid;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .18);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  }
+  .toolrail button {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .22);
+    background: rgba(12, 15, 21, .5);
+    color: #eef1f7;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  /* ── 角色层：靠角落，不压正文 ── */
+  .mascot {
+    position: absolute;
+    right: 26px;
+    bottom: 22px;
+    z-index: 7;
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 220ms cubic-bezier(.22, .61, .36, 1);
+  }
+  .mascot:active { cursor: grabbing; }
+  .mascot svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .45)); }
+  .mascot[data-dragging="true"] { transition: none; }
+  .mascot:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 50%; }
+  .mascot-hint {
+    position: absolute;
+    right: 26px;
+    bottom: 92px;
+    z-index: 7;
+    font-size: 11.5px;
+    color: #dfe4ee;
+    background: rgba(12, 15, 21, .6);
+    border: 1px solid rgba(255, 255, 255, .16);
+    padding: 3px 9px;
+    border-radius: 999px;
+    opacity: 0;
+    transition: opacity 160ms;
+    pointer-events: none;
+  }
+  .mascot-hint[data-on="true"] { opacity: 1; }
+
+  /* ── 设置抽屉：任务区，不进玻璃预算 ── */
+  .settings {
+    grid-column: 2 / 3;
+    grid-row: 1 / 4;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 10px;
+    border-radius: 14px;
+    background: #e9e5db;
+    border: 1px solid var(--line);
+    padding: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+  }
+  .settings h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0 0 8px; }
+  .settings .body { overflow: auto; display: grid; gap: 14px; align-content: start; }
+  .field { display: grid; gap: 4px; }
+  .field label { font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; }
+  .field input[type="range"], .field select { width: 100%; }
+  .field output { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row button {
+    border: 1px solid var(--line);
+    background: #fdfbf6;
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .row button:hover { border-color: rgba(23, 24, 28, .32); }
+  .saved { font-size: 12px; color: var(--muted); min-height: 1.4em; }
+  .saved[data-state="saving"] { color: #8a6a1e; }
+  .saved[data-state="failed"] { color: #a4392a; }
+  textarea {
+    width: 100%;
+    min-height: 92px;
+    font: 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    padding: 8px;
+    background: #fdfbf6;
+    resize: vertical;
+  }
+  .note { font-size: 11.5px; color: var(--muted); margin: 0; }
+
+  /* 减少动态：整页只保留一次性的状态变化 */
+  @media (prefers-reduced-motion: reduce) {
+    .stage-layer, .mascot, .mascot-hint { transition-duration: 1ms !important; }
+  }
+  body[data-reduced="true"] .stage-layer,
+  body[data-reduced="true"] .mascot,
+  body[data-reduced="true"] .mascot-hint { transition-duration: 1ms !important; }
+
+  @media (max-width: 900px) {
+    body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(320px, 1fr) auto auto; }
+    .stage { grid-row: 1 / 2; }
+    .settings { grid-column: 1 / 2; grid-row: 2 / 4; max-height: 46vh; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="stage-layer scene-a" data-scene="a" data-state="live"></div>
+    <div class="stage-layer scene-b" data-scene="b" data-state="dead"></div>
+    <div class="stage-layer scene-c scene-poster" data-scene="c" data-state="dead"></div>
+
+    <div class="stage-hud" role="group" aria-label="场景选择">
+      <button type="button" data-pick="a" aria-pressed="true">书房</button>
+      <button type="button" data-pick="b" aria-pressed="false">暮色</button>
+      <button type="button" data-pick="c" aria-pressed="false">海报回退</button>
+    </div>
+
+    <div class="stage-status" id="stageStatus" data-kind="ready" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span><span id="stageStatusText">书房 · 实时层已就绪</span>
+    </div>
+
+    <div class="workspace">
+      <article class="reading" id="reading">
+        <h1>潮汐书房 · 阅读面</h1>
+        <div class="meta">第 7 章 · 一个完整的前端生态搭建</div>
+        <p>这一面承担阅读，不承担氛围。场景可以换，玻璃可以调，这里的底色与文字对比度必须是整个界面里最稳的一处。</p>
+        <p>如果你正在比较两个场景，注意看的是：正文第一行是否仍然一眼可读，而不是背景有多好看。</p>
+        <p>把工具面遮罩压到 0.60 再读一遍；换成黑白条纹背衬再读一遍。两遍都过，才算这一面成立。</p>
+        <div class="controls">
+          <button type="button" id="markRead">标记已读</button>
+          <span class="note" id="readState">未读</span>
+        </div>
+      </article>
+
+      <nav class="toolrail" aria-label="工具栏">
+        <button type="button" title="搜索" aria-label="搜索">⌕</button>
+        <button type="button" title="设置" aria-label="打开设置" id="railSettings">⚙</button>
+      </nav>
+    </div>
+
+    <div class="mascot-hint" id="mascotHint" data-on="false">继续下拉开设置</div>
+    <div class="mascot" id="mascot" role="button" tabindex="0" aria-label="巡灯员，按回车打开设置，可拖动下拉">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <ellipse cx="32" cy="56" rx="15" ry="4" fill="rgba(0,0,0,.35)" />
+        <path d="M32 6c11 0 19 8.4 19 19.4 0 6.6-2.8 11.8-6.3 15.6-2.6 2.8-5.9 4.4-9.2 4.8l-.6 5.2H28.1l-.6-5.2c-3.3-.4-6.6-2-9.2-4.8C14.8 37.2 13 32 13 25.4 13 14.4 21 6 32 6z" fill="#e8e2d4" />
+        <circle cx="25.4" cy="24.6" r="2.6" fill="#1b1d24" />
+        <circle cx="38.6" cy="24.6" r="2.6" fill="#1b1d24" />
+        <path d="M27.4 33.4c1.6 1.7 3.2 2.5 4.6 2.5s3-.8 4.6-2.5" stroke="#1b1d24" stroke-width="2" fill="none" stroke-linecap="round" />
+        <path d="M13.6 20.6c2.6-6.8 9.2-11 18.4-11" stroke="#b8542a" stroke-width="2.4" fill="none" stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+
+  <aside class="settings" id="settings" aria-label="外观设置">
+    <div>
+      <h2>外观</h2>
+      <div class="saved" id="saveState" data-state="saved">已保存</div>
+    </div>
+    <div class="body">
+      <div class="field">
+        <label for="blur">模糊 <output id="blurOut">16px</output></label>
+        <input id="blur" type="range" min="0" max="60" step="1" value="16" />
+      </div>
+      <div class="field">
+        <label for="alpha">界面透明度 <output id="alphaOut">20%</output></label>
+        <input id="alpha" type="range" min="0" max="100" step="1" value="20" />
+      </div>
+      <div class="field">
+        <label for="fidelity">保真度 <output id="fidelityOut">100%</output></label>
+        <input id="fidelity" type="range" min="0" max="100" step="1" value="100" />
+      </div>
+      <div class="field">
+        <label for="preset">预设</label>
+        <select id="preset">
+          <option value="">自定义</option>
+          <option value="16,20,100">代码默认 16 / 20% / 100%</option>
+          <option value="24,40,100">可读优先 24 / 40% / 100%</option>
+          <option value="18,50,35">原色直出 18 / 50% / 35%</option>
+        </select>
+      </div>
+      <div class="row">
+        <button type="button" id="toggleMotion">关闭环境动效</button>
+        <button type="button" id="toggleMascot">隐藏巡灯员</button>
+      </div>
+      <div class="field">
+        <label for="profile">偏好 JSON（可导出 / 导入）</label>
+        <textarea id="profile" spellcheck="false"></textarea>
+      </div>
+      <div class="row">
+        <button type="button" id="applyProfile">校验并应用</button>
+        <button type="button" id="resetProfile">恢复默认</button>
+      </div>
+      <p class="note">业务事实（已读）与长期偏好（模糊/透明度/角色开关）分开保存；运行状态（当前场景、首帧、失败冷却）不进入导出。</p>
+    </div>
+  </aside>
+
+<script>
+(function () {
+  "use strict";
+  var stage = document.getElementById("stage");
+  var status = document.getElementById("stageStatus");
+  var statusText = document.getElementById("stageStatusText");
+  var saveState = document.getElementById("saveState");
+  var reading = document.getElementById("reading");
+  var mascot = document.getElementById("mascot");
+  var hint = document.getElementById("mascotHint");
+
+  var ROPE_PREVIEW_START = 32;
+  var ROPE_OPEN_THRESHOLD = 96;
+  var DRAG_SLOP = 6;
+
+  var generation = 0;
+  var currentScene = "a";
+  var pending = null;
+  var motionOn = true;
+  var profile = { version: 1, scene: "a", blur: 16, alpha: 20, fidelity: 100, mascot: true, motion: true };
+  var readIds = {};
+
+  function setStatus(kind, text) {
+    status.setAttribute("data-kind", kind);
+    statusText.textContent = text;
+  }
+
+  /* ── 场景交接：新画面可用前旧画面不动，请求按代次收敛 ── */
+  function requestScene(next) {
+    if (next === currentScene) return;
+    var mine = ++generation;
+    pending = next;
+    setStatus("loading", "正在准备「" + labelOf(next) + "」");
+
+    document.querySelectorAll(".stage-hud button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-pick") === next));
+    });
+
+    var ready = next === "c" ? 600 : 420 + Math.random() * 480;
+    window.setTimeout(function () {
+      if (mine !== generation) return;          // 旧回调作废
+      commitScene(next, mine);
+    }, ready);
+  }
+
+  function labelOf(id) {
+    return { a: "书房", b: "暮色", c: "海报回退" }[id] || id;
+  }
+
+  function commitScene(next, mine) {
+    if (mine !== generation) return;
+    var incoming = stage.querySelector('[data-scene="' + next + '"]');
+    var outgoing = stage.querySelector('[data-scene="' + currentScene + '"]');
+    if (incoming) {
+      incoming.setAttribute("data-state", "live");
+      if (outgoing) outgoing.setAttribute("data-state", "dead");
+    }
+    currentScene = next;
+    profile.scene = next;
+    pending = null;
+    if (next === "c") {
+      setStatus("paused", "海报回退 · 实时层不可用，已停在可识别画面");
+    } else {
+      setStatus("ready", labelOf(next) + " · 实时层已就绪");
+    }
+    syncProfileBox();
+  }
+
+  stage.querySelectorAll("[data-pick]").forEach(function (btn) {
+    btn.addEventListener("click", function () { requestScene(btn.getAttribute("data-pick")); });
+  });
+
+  /* ── 角色：预览走连续通道，提交走单次通道 ── */
+  var drag = null;
+  var opened = false;
+
+  function openSettings(from) {
+    var rect = settingsEl.getBoundingClientRect();
+    settingsEl.style.outline = "2px solid " + (from === "gesture" ? "#b8542a" : "transparent");
+    window.setTimeout(function () { settingsEl.style.outline = ""; }, 700);
+    settingsEl.scrollIntoView({ block: "nearest", behavior: motionOn ? "smooth" : "auto" });
+  }
+
+  mascot.addEventListener("pointerdown", function (e) {
+    drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dy: 0, moved: false };
+    mascot.setPointerCapture(e.pointerId);
+    mascot.setAttribute("data-dragging", "true");
+  });
+
+  mascot.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x0;
+    var dy = e.clientY - drag.y0;
+    if (!drag.moved && Math.hypot(dx, dy) < DRAG_SLOP) return;
+    drag.moved = true;
+    drag.dy = Math.max(0, dy);
+    if (drag.dy > ROPE_PREVIEW_START) {
+      // 只更新预览，不改提交状态
+      mascot.style.transform = "translateY(" + Math.min(drag.dy, ROPE_OPEN_THRESHOLD) + "px)";
+      hint.setAttribute("data-on", "true");
+      hint.textContent = drag.dy >= ROPE_OPEN_THRESHOLD ? "松手打开设置" : "继续下拉开设置";
+    }
+  });
+
+  mascot.addEventListener("pointerup", function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var committed = drag.dy >= ROPE_OPEN_THRESHOLD;
+    var wasMove = drag.moved;
+    drag = null;
+    mascot.removeAttribute("data-dragging");
+    mascot.style.transform = "";
+    hint.setAttribute("data-on", "false");
+    if (committed) {
+      opened = !opened;
+      if (opened) openSettings("gesture");
+    } else if (!wasMove) {
+      opened = !opened;
+      if (opened) openSettings("tap");
+    }
+  });
+
+  mascot.addEventListener("pointercancel", function () {
+    drag = null;
+    mascot.removeAttribute("data-dragging");
+    mascot.style.transform = "";
+    hint.setAttribute("data-on", "false");
+    // 取消不改变开合状态
+  });
+
+  mascot.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      opened = !opened;
+      if (opened) openSettings("keyboard");
+    }
+  });
+
+  /* ── 表面参数 ── */
+  var settingsEl = document.getElementById("settings");
+  var blur = document.getElementById("blur");
+  var alpha = document.getElementById("alpha");
+  var fidelity = document.getElementById("fidelity");
+  var blurOut = document.getElementById("blurOut");
+  var alphaOut = document.getElementById("alphaOut");
+  var fidelityOut = document.getElementById("fidelityOut");
+
+  function applySurface() {
+    var b = Number(blur.value);
+    var a = Number(alpha.value);
+    var f = Number(fidelity.value);
+    // 源码曲线：a = max(0.10, 0.25 - glassAlpha/100 * 0.15)
+    var glassA = Math.max(0.10, 0.25 - (a / 100) * 0.15);
+    document.documentElement.style.setProperty("--glass-blur", b + "px");
+    document.documentElement.style.setProperty("--glass-alpha", String(glassA));
+    document.documentElement.style.setProperty("--glass-fidelity", String(f / 100));
+    blurOut.textContent = b + "px";
+    alphaOut.textContent = a + "%";
+    fidelityOut.textContent = f + "%";
+    profile.blur = b; profile.alpha = a; profile.fidelity = f;
+    scheduleSave();
+  }
+
+  var saveTimer = null;
+  function scheduleSave() {
+    saveState.setAttribute("data-state", "saving");
+    saveState.textContent = "保存中…";
+    syncProfileBox();
+    if (saveTimer) window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(function () {
+      saveState.setAttribute("data-state", "saved");
+      saveState.textContent = "已保存 · " + new Date().toLocaleTimeString();
+    }, 200);
+  }
+
+  blur.addEventListener("input", applySurface);
+  alpha.addEventListener("input", applySurface);
+  fidelity.addEventListener("input", applySurface);
+
+  document.getElementById("preset").addEventListener("change", function (e) {
+    var v = e.target.value;
+    if (!v) return;
+    var parts = v.split(",");
+    blur.value = parts[0]; alpha.value = parts[1]; fidelity.value = parts[2];
+    applySurface();
+  });
+
+  /* ── 业务事实与长期偏好分开 ── */
+  document.getElementById("markRead").addEventListener("click", function () {
+    readIds[currentScene] = true;
+    document.getElementById("readState").textContent = "已读 · " + new Date().toLocaleTimeString();
+  });
+
+  var motionBtn = document.getElementById("toggleMotion");
+  motionBtn.addEventListener("click", function () {
+    motionOn = !motionOn;
+    profile.motion = motionOn;
+    document.body.setAttribute("data-reduced", String(!motionOn));
+    motionBtn.textContent = motionOn ? "关闭环境动效" : "开启环境动效";
+    scheduleSave();
+  });
+
+  var mascotBtn = document.getElementById("toggleMascot");
+  mascotBtn.addEventListener("click", function () {
+    var on = profile.mascot !== false;
+    profile.mascot = !on;
+    mascot.style.display = profile.mascot ? "" : "none";
+    hint.setAttribute("data-on", "false");
+    mascotBtn.textContent = profile.mascot ? "隐藏巡灯员" : "显示巡灯员";
+    // 角色隐藏后，设置入口仍在工具栏
+    scheduleSave();
+  });
+
+  document.getElementById("railSettings").addEventListener("click", function () { openSettings("toolbar"); });
+
+  /* ── 偏好：校验 → 准备 → 提交 → 保存 → 报告 ── */
+  var profileBox = document.getElementById("profile");
+
+  function syncProfileBox() {
+    profileBox.value = JSON.stringify(profile, null, 2);
+  }
+
+  document.getElementById("applyProfile").addEventListener("click", function () {
+    var next;
+    try {
+      next = JSON.parse(profileBox.value);
+    } catch (err) {
+      saveState.setAttribute("data-state", "failed");
+      saveState.textContent = "JSON 解析失败，保持先前状态";
+      return;
+    }
+    if (!next || next.version !== 1) {
+      saveState.setAttribute("data-state", "failed");
+      saveState.textContent = "版本不受支持，保持先前状态";
+      return;
+    }
+    var clamp = function (v, lo, hi, fallback) {
+      var n = Number(v);
+      return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : fallback;
+    };
+    var candidate = {
+      version: 1,
+      scene: ["a", "b", "c"].indexOf(next.scene) >= 0 ? next.scene : profile.scene,
+      blur: clamp(next.blur, 0, 60, 16),
+      alpha: clamp(next.alpha, 0, 100, 20),
+      fidelity: clamp(next.fidelity, 0, 100, 100),
+      mascot: next.mascot !== false,
+      motion: next.motion !== false
+    };
+    profile = candidate;
+    blur.value = candidate.blur; alpha.value = candidate.alpha; fidelity.value = candidate.fidelity;
+    motionOn = candidate.motion;
+    document.body.setAttribute("data-reduced", String(!motionOn));
+    motionBtn.textContent = motionOn ? "关闭环境动效" : "开启环境动效";
+    mascot.style.display = candidate.mascot ? "" : "none";
+    mascotBtn.textContent = candidate.mascot ? "隐藏巡灯员" : "显示巡灯员";
+    applySurface();
+    if (candidate.scene !== currentScene) requestScene(candidate.scene);
+    saveState.setAttribute("data-state", "saved");
+    saveState.textContent = "已应用并保存";
+    syncProfileBox();
+  });
+
+  document.getElementById("resetProfile").addEventListener("click", function () {
+    profile = { version: 1, scene: "a", blur: 16, alpha: 20, fidelity: 100, mascot: true, motion: true };
+    blur.value = 16; alpha.value = 20; fidelity.value = 100;
+    motionOn = true;
+    document.body.setAttribute("data-reduced", "false");
+    motionBtn.textContent = "关闭环境动效";
+    mascot.style.display = "";
+    mascotBtn.textContent = "隐藏巡灯员";
+    applySurface();
+    requestScene("a");
+    syncProfileBox();
+  });
+
+  applySurface();
+  syncProfileBox();
+})();
+</script>
+</body>
+</html>

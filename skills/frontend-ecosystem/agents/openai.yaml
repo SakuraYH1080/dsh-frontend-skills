@@ -1,0 +1,4 @@
+display_name: 前端生态多层协作
+short_description: 场景 / 表面 / 角色 / 氛围 / 业务界面共存时的职责划分、首帧交接、可读性背衬与偏好配置协议。
+brand_color: "#B8542A"
+default_prompt: 用 frontend-ecosystem 规划这个产品：先定核心任务，再分层写清每层的启用与让位条件，然后给出换场景交接、玻璃可读性与角色拉绳的落地方案，最后按验收矩阵自检。

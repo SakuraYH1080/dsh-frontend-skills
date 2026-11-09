@@ -1,10 +1,12 @@
 # dsh-frontend-skills
 
-五个面向前端视觉设计的中文 Agent Skill，可被 DSH / Claude Code / Cursor 等支持 `AGENTS.md` 式 skill 目录的 agent 直接索引。
+六个面向前端视觉设计的中文 Agent Skill，可被 DSH / Claude Code / Cursor 等支持 `AGENTS.md` 式 skill 目录的 agent 直接索引。
 
 每个 skill 是一个自包含目录：根目录 `SKILL.md`（YAML frontmatter + 判据正文），配 `references/` 细则、`assets/` 可抄的 token 与代码、`templates/` 可双击打开的模板、`examples/`、`VERIFICATION.md`（自检清单与实测记录）。
 
 它们的共同设计前提：**只解决自己那一层的问题，把别的层留给兄弟 skill。** 一个页面里同时要角色、留白、玻璃、粒子时，必须指定一个主导语言，其余服从。
+
+其中一个（`frontend-ecosystem`）不生产视觉，它是编排层：只回答「这几层同时存在时，谁在什么时候让位、怎么退出、偏好怎么存」。
 
 ---
 
@@ -17,6 +19,9 @@
 | [`frontend-industrial-sci-fi`](skills/frontend-industrial-sci-fi/) | 工业科幻视觉系统：双底色、单一信号色、切角几何、HUD 编号、三态语义 | 控制台、数据面板、监控大屏、单机游戏 UI；切角像贴纸、强调色撞车 |
 | [`frontend-liquid-glass`](skills/frontend-liquid-glass/) | 液态玻璃材质：模糊/折射/边缘高光/环境色渗透四成因与九旋钮参数 | 玻璃导航栏、浮层、播放器面板；玻璃糊成一片、读不清、移动端掉帧 |
 | [`frontend-particles`](skills/frontend-particles/) | 粒子层：发射器与寿命、力场与噪声流场、三条渲染路线选型、性能预算 | 粒子背景、星场、鼠标跟随与连接线；canvas 动画掉帧、粒子压住正文 |
+| [`frontend-ecosystem`](skills/frontend-ecosystem/) | 多层协作编排：五层职责切分、按就绪交接的场景切换、表面可读性秩序、角色安全区、偏好寿命与版本化预设 | 场景 + 玻璃 + 角色 + 设置同处一个产品；换壁纸闪黑、玻璃读不清、角色挡内容、设置存不住 |
+
+`frontend-ecosystem` 与其他五个不是并列关系：它只在「多层同时开工」时上场，单项问题仍然交给对应的专项 skill，它自己不调材质、不画角色、不做粒子。
 
 另有 `frontend-taste-base`（通用品味基线：节高、动效层级、AI 味自查）未收录在本仓库，属上游层，按需自行加装。
 
@@ -93,7 +98,7 @@ skills/
     examples/           截图与示例
 ```
 
-84 个文件，约 680 KB。
+98 个文件，约 812 KB。
 
 ---
 

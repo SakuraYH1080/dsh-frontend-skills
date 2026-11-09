@@ -1,0 +1,57 @@
+{
+  "$comment": "frontend-ecosystem · 运行期状态形状。字段名与合法值即契约，可直接当 schema 抄。",
+  "version": "1.0.0",
+  "stage": {
+    "requested": { "type": "string", "desc": "用户最后一次选择的 assetId" },
+    "displayed": { "type": "string|null", "desc": "当前真正在屏幕上的 assetId；只由 commit() 改写" },
+    "tier": { "enum": ["live", "video", "poster", "solid"], "desc": "当前生效档位" },
+    "pending": { "type": "string|null", "desc": "正在准备中的 assetId" },
+    "poster": { "type": "string|null", "desc": "当前可用的静态兜底图" },
+    "reason": { "enum": ["idle", "loading", "paused", "hidden", "low-power", "decode-failed", "render-failed", "offline"], "desc": "状态原因，必须能区分用户主动与系统被动" },
+    "generation": { "type": "integer", "desc": "单调递增；回调必须与当前值相等才允许提交" }
+  },
+  "surface": {
+    "perSurface": {
+      "type": "object",
+      "shape": {
+        "reading|chrome|modal|control": {
+          "provider": { "enum": ["native", "canvas", "local-glass", "solid"], "desc": "一个表面只允许一个承载者" },
+          "blur": { "type": "number", "min": 0, "max": 60, "sourceDefault": 16 },
+          "tint": { "type": "number", "min": 0, "max": 1, "sourceDefault": 0.35, "note": "对应源码 border 默认值；界面以百分比呈现时为 35%" },
+          "floor": { "type": "number", "min": 0, "max": 1, "note": "阅读底色；源码 READABILITY_FLOOR 0.45 / READABILITY_FLOOR_DARK 0.59 再乘保真度" },
+          "contrast": { "type": "number", "min": 1, "max": 21, "req": ">= 4.5" }
+        }
+      }
+    },
+    "backdropProbe": { "enum": ["white", "black", "stripes", "live"], "desc": "当前可读性复核背衬" }
+  },
+  "actor": {
+    "mode": { "enum": ["wallpaper", "mascot", "avatar", "desktop-pet"], "desc": "四个位置各有独立状态，不共用动画状态机" },
+    "provider": { "enum": ["native", "linked"], "desc": "每次条件变化重判；手势进行中失效只降级" },
+    "anchor": { "type": "object", "shape": { "x": "number", "y": "number" } },
+    "safeArea": { "type": "object", "desc": "face / content / hitTargets / panelEdge 四矩形" },
+    "gesture": { "enum": ["idle", "armed", "previewing", "committing", "cancelling"] },
+    "committed": { "type": "boolean", "desc": "开合状态；previewing 期间不得改写" }
+  },
+  "profile": {
+    "version": { "type": "integer", "desc": "预设 schema 版本" },
+    "values": { "type": "object", "desc": "长期偏好：场景、玻璃数值、角色开关、缩放" },
+    "assets": { "type": "object", "desc": "字体 / 立绘 / 头像；字段缺失=保持现有，null=回默认，字符串=指向出厂形态" },
+    "savedAt": { "type": "string", "format": "iso8601" },
+    "dirty": { "type": "boolean", "desc": "有改动未写；与 saving / saved / failed 分开表达" }
+  },
+  "reader": {
+    "docId": { "type": "string" },
+    "progress": { "type": "number", "min": 0, "max": 1 },
+    "updatedAt": { "type": "string", "format": "iso8601" },
+    "$comment": "业务事实。与 profile 分开保存，绝不出现在主题包里。"
+  },
+  "runtime": {
+    "visible": { "type": "boolean" },
+    "playing": { "type": "boolean", "desc": "用户的播放意图，不是事实" },
+    "reducedMotion": { "type": "boolean" },
+    "failures": { "type": "array", "items": "string", "desc": "会话内软失败，不落盘" },
+    "cooldownUntil": { "type": "number", "desc": "毫秒时间戳；冷却期内不重试" },
+    "$comment": "运行事实。刷新即失效，永不导出。"
+  }
+}
