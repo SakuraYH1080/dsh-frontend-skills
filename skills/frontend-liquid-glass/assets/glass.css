@@ -1,0 +1,161 @@
+/* frontend-liquid-glass · CSS kit v1.0
+   只做材质。类名前缀 .lg-，不依赖框架，不覆盖你的版式。
+   用法：<link rel="stylesheet" href="glass.css"> 然后把 .lg 加到浮层上。 */
+
+:root {
+  /* 九旋钮的默认值 = standard 预设（浅色） */
+  --lg-blur: 24px;
+  --lg-saturate: 160%;
+  --lg-brightness: 112%;
+  --lg-tint-rgb: 255 255 255;
+  --lg-tint-alpha: 0.42;
+  --lg-border-alpha: 0.40;
+  --lg-border-width: 1px;
+  --lg-highlight-alpha: 0.70;
+  --lg-shadow-near: 0 1px 3px rgba(0,0,0,.12);
+  --lg-shadow-far: 0 14px 44px rgba(0,0,0,.22);
+  --lg-noise: 0.045;
+  --lg-radius: 18px;
+  --lg-content-alpha: 0.78;
+  /* 承载层：文字实际坐在这个不透明度上，决定可读性 */
+  --lg-scrim: rgba(255 255 255 / calc(var(--lg-tint-alpha) + 0.18));
+
+  --lg-ease-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --lg-ease-out: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.lg[data-lg-preset="thin"] {
+  --lg-blur: 12px; --lg-saturate: 130%; --lg-brightness: 108%;
+  --lg-tint-alpha: 0.28; --lg-border-alpha: 0.34; --lg-highlight-alpha: 0.55;
+  --lg-shadow-near: 0 1px 2px rgba(0,0,0,.10); --lg-shadow-far: 0 8px 28px rgba(0,0,0,.16);
+  --lg-noise: 0.035; --lg-content-alpha: 0.62;
+}
+.lg[data-lg-preset="deep"] {
+  --lg-blur: 40px; --lg-saturate: 180%; --lg-brightness: 116%;
+  --lg-tint-alpha: 0.55; --lg-border-alpha: 0.46; --lg-highlight-alpha: 0.85;
+  --lg-shadow-near: 0 2px 6px rgba(0,0,0,.16); --lg-shadow-far: 0 28px 90px rgba(0,0,0,.34);
+  --lg-noise: 0.055; --lg-content-alpha: 0.90;
+}
+.lg[data-lg-preset="frost"] {
+  --lg-blur: 8px; --lg-saturate: 100%; --lg-brightness: 104%;
+  --lg-tint-alpha: 0.72; --lg-border-alpha: 0.28; --lg-highlight-alpha: 0.40;
+  --lg-shadow-near: 0 1px 2px rgba(0,0,0,.08); --lg-shadow-far: 0 6px 20px rgba(0,0,0,.12);
+  --lg-noise: 0.030; --lg-content-alpha: 0.98;
+}
+
+/* 深色：玻璃是"减光"的，不是把白色调透明度 */
+.lg[data-lg-theme="dark"] {
+  --lg-tint-rgb: 12 16 23;
+  --lg-border-alpha: 0.30;
+  --lg-scrim: rgba(8 10 16 / calc(var(--lg-tint-alpha) + 0.20));
+}
+
+/* 核心：四件事里最容易漏的三件都在这一条里 */
+.lg {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--lg-radius);
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(var(--lg-tint-rgb) / calc(var(--lg-tint-alpha) * 1.18)),
+      rgb(var(--lg-tint-rgb) / var(--lg-tint-alpha))
+    );
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  border: var(--lg-border-width) solid rgb(255 255 255 / var(--lg-border-alpha));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / var(--lg-highlight-alpha)),
+    inset 0 -1px 0 rgb(255 255 255 / calc(var(--lg-highlight-alpha) * 0.28)),
+    var(--lg-shadow-near),
+    var(--lg-shadow-far);
+  color: rgb(17 20 26 / var(--lg-content-alpha));
+}
+
+/* 表面细噪声：消除大面积纯色玻璃的塑料感。
+   用 CSS 生成的 SVG 噪声，不额外请求图片。 */
+.lg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--lg-noise);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+}
+
+/* 折射：真折射走 SVG 滤镜（见 glass.js 注入的 #lg-refract）；
+   不支持时不加，绝不用 filter:blur 假装。 */
+.lg[data-lg-refract="on"] { backdrop-filter: url(#lg-refract) blur(var(--lg-blur)); }
+
+/* 层叠：第 2 / 3 层必须递减模糊并提高不透明度 */
+.lg-stack > .lg:nth-child(2) {
+  --lg-blur: calc(24px * 0.5);
+  --lg-tint-alpha: 0.54;
+}
+.lg-stack > .lg:nth-child(3) {
+  --lg-blur: calc(24px * 0.25);
+  --lg-tint-alpha: 0.64;
+}
+
+/* 承载层：需要放正文的玻璃先垫一层 */
+.lg-scrim {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: var(--lg-scrim); pointer-events: none;
+}
+
+/* 形状 */
+.lg-nav   { border-radius: 0; border-left: 0; border-right: 0; border-top: 0; }
+.lg-sheet { border-radius: 22px 22px 0 0; }
+.lg-chip  { --lg-radius: 999px; padding: 4px 10px; font-size: 12px; }
+
+/* 动效：玻璃自己只做"浮现"，不做缩放弹跳 */
+.lg-enter { animation: lg-enter 240ms var(--lg-ease-in) both; }
+@keyframes lg-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.lg-exit { animation: lg-exit 160ms var(--lg-ease-out) both; }
+@keyframes lg-exit {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(4px); }
+}
+
+/* 降级阶梯 ————————————————————————————— */
+
+/* 1) 系统要求减少透明：直接实心，层级靠阴影与边框保住 */
+@media (prefers-reduced-transparency: reduce) {
+  .lg {
+    --lg-tint-alpha: 0.98;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: rgb(0 0 0 / 0.14);
+    box-shadow: var(--lg-shadow-near), var(--lg-shadow-far);
+  }
+  .lg::after { display: none; }
+}
+
+/* 2) 浏览器不支持 backdrop-filter：用更实的底色 + 更强边框顶上 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .lg {
+    --lg-tint-alpha: 0.92;
+    --lg-border-alpha: 0.55;
+  }
+}
+
+/* 3) 低端设备 / 省电：由 glass.js 打 .lg-lite，模糊降到 6px 并关掉噪声 */
+.lg-lite { --lg-blur: 6px; --lg-saturate: 110%; }
+.lg-lite::after { display: none; }
+
+/* 4) 打印：玻璃不存在 */
+@media print {
+  .lg { backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; box-shadow: none; border: 1px solid #ddd; }
+  .lg::after { display: none; }
+}
+
+/* 无障碍焦点：玻璃上必须看得见 */
+.lg :focus-visible, .lg:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+}

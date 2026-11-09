@@ -1,0 +1,342 @@
+/* frontend-industrial-sci-fi · industrial.css
+ * 零依赖、零构建。变量只在 :root 与 [data-isx-preset] 上赋值。
+ * 硬约束：border-radius 恒 0；无 box-shadow；无 linear-gradient；线宽只有 1px。
+ */
+
+:root {
+  /* ---- 基础色 ---- */
+  --isx-ink-950: #07090A;
+  --isx-ink-900: #0A0C0E;
+  --isx-ink-850: #111417;
+  --isx-ink-700: #1C2126;
+  --isx-ink-500: #828E96;
+  --isx-ink-300: #8B979F;
+  --isx-paper-000: #F2F4F3;
+  --isx-paper-100: #E3E7E5;
+
+  /* ---- 语义槽位（由预设改写） ---- */
+  --isx-page: var(--isx-ink-900);
+  --isx-panel: var(--isx-ink-850);
+  --isx-raised: var(--isx-ink-700);
+  --isx-text: var(--isx-paper-000);
+  --isx-text-2: var(--isx-ink-300);
+  --isx-text-3: var(--isx-ink-500);
+  --isx-line: #66737B;
+  --isx-line-weak: #262C31;
+
+  /* ---- 两条通道 ---- */
+  --isx-signal: #C8F04B;          /* accent：只填充 */
+  --isx-signal-hover: #BCE146;    /* accent hover：显式值，不用 filter 压暗 */
+  --isx-on-signal: #0A0C0E;       /* 压在 signal 填充上的文字 */
+  --isx-nominal: #8B979F;         /* state */
+  --isx-caution: #E8A33D;         /* state */
+  --isx-interrupt: #E2453C;       /* state */
+
+  /* ---- 几何 ---- */
+  --isx-cut: 8px;
+  --isx-cut-inner: calc(var(--isx-cut) - 1.414px);
+  --isx-cut-chip: 4px;
+  --isx-cut-panel: 14px;
+  --isx-hairline: 1px;
+
+  /* ---- 排版 ---- */
+  --isx-f-label: "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+  --isx-f-num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --isx-f-body: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --isx-track: 0.14em;
+
+  /* ---- 间距 / 行高 ---- */
+  --isx-row: 32px;
+  --isx-pad: 16px;
+  --isx-s1: 4px;
+  --isx-s2: 8px;
+  --isx-s3: 12px;
+  --isx-s4: 16px;
+  --isx-s6: 24px;
+  --isx-s12: 48px;
+  --isx-s16: 64px;
+
+  /* ---- 动效 ---- */
+  --isx-dur: 140ms;
+  --isx-tick: 90ms;
+  --isx-enter: 220ms;
+  --isx-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---------- 预设：只改变量，不改组件 ---------- */
+:root[data-isx-preset="standard"] {
+  --isx-row: 32px; --isx-cut: 8px; --isx-pad: 16px; --isx-dur: 140ms;
+}
+:root[data-isx-preset="cold-store"] {
+  --isx-page: #F2F4F3; --isx-panel: #E3E7E5; --isx-raised: #D6DCD9;
+  --isx-text: #0A0C0E; --isx-text-2: #4A545C; --isx-text-3: #56626A;
+  --isx-line: #717C83; --isx-line-weak: #CBD2CF;
+  --isx-signal: #5A6D1E; --isx-signal-hover: #4C5D19; --isx-on-signal: #F2F4F3;
+  --isx-nominal: #6E7A82; --isx-caution: #8F5A10; --isx-interrupt: #B22E26;
+  --isx-row: 36px; --isx-cut: 8px; --isx-pad: 20px; --isx-dur: 160ms;
+}
+:root[data-isx-preset="site"] {
+  --isx-page: #07090A;
+  --isx-row: 40px; --isx-cut: 4px; --isx-pad: 16px; --isx-dur: 140ms;
+}
+:root[data-isx-preset="night-shift"] {
+  --isx-page: #07090A; --isx-panel: #0A0C0E; --isx-raised: #111417;
+  --isx-text: #E3E7E5; --isx-line: #66737B; --isx-line-weak: #1C2126;
+  --isx-signal: #A6C43E; --isx-signal-hover: #98B536;
+  --isx-row: 32px; --isx-cut: 8px; --isx-pad: 16px; --isx-dur: 90ms;
+}
+
+/* ---------- 复位 ---------- */
+*, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+html, body { margin: 0; }
+body {
+  background: var(--isx-page);
+  color: var(--isx-text);
+  font: 400 13px/1.45 var(--isx-f-body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--isx-signal); text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; background: none; border: 0; }
+::selection { background: var(--isx-signal); color: var(--isx-on-signal); }
+:focus-visible { outline: 1px solid var(--isx-signal); outline-offset: 1px; }
+
+/* ---------- 切角：外框色 + 内层 inset 1px ---------- */
+.isx-cut {
+  --c: var(--isx-cut);
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c),
+                     100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+  background: var(--isx-line);
+}
+.isx-cut::before {
+  --ci: calc(var(--c) - 1.414px);
+  content: "";
+  position: absolute;
+  inset: var(--isx-hairline);
+  clip-path: polygon(0 0, calc(100% - var(--ci)) 0, 100% var(--ci),
+                     100% 100%, var(--ci) 100%, 0 calc(100% - var(--ci)));
+  background: var(--isx-panel);
+  z-index: 0;
+}
+.isx-cut > * { position: relative; z-index: 1; }
+.isx-cut--chip { --c: var(--isx-cut-chip); }
+.isx-cut--panel { --c: var(--isx-cut-panel); }
+
+/* ---------- 面板 / 卡片 ---------- */
+.isx-card {
+  --c: var(--isx-cut);
+  position: relative;
+  padding: var(--isx-pad);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c),
+                     100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+  background: var(--isx-line);
+}
+.isx-card::before {
+  --ci: calc(var(--c) - 1.414px);
+  content: "";
+  position: absolute;
+  inset: var(--isx-hairline);
+  z-index: 0;
+  clip-path: polygon(0 0, calc(100% - var(--ci)) 0, 100% var(--ci),
+                     100% 100%, var(--ci) 100%, 0 calc(100% - var(--ci)));
+  background: var(--isx-panel);
+}
+.isx-card > * { position: relative; z-index: 1; }
+.isx-card--flush { padding: 0; }
+
+/* ---------- 分区标题 ---------- */
+.isx-zone-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--isx-s3);
+  padding-bottom: var(--isx-s2);
+  border-bottom: var(--isx-hairline) solid var(--isx-line);
+  margin-bottom: var(--isx-s4);
+}
+.isx-zone-id { font: 500 10px/1.2 var(--isx-f-label); letter-spacing: 0.18em; color: var(--isx-text-2); }
+.isx-zone-title {
+  margin: 0; font: 700 13px/1.2 var(--isx-f-body); letter-spacing: 0;
+  display: flex; align-items: baseline; gap: var(--isx-s2);
+}
+.isx-zone-title span {
+  font: 500 11px/1.2 var(--isx-f-label);
+  letter-spacing: var(--isx-track);
+  text-transform: uppercase;
+  color: var(--isx-text-2);
+  transform: scaleX(1.06); transform-origin: left;
+}
+.isx-zone-count { margin-left: auto; font: 500 10px/1.2 var(--isx-f-label); letter-spacing: 0.18em; color: var(--isx-text-3); }
+
+/* ---------- 标签 / 读数 / 单位 ---------- */
+.isx-label {
+  font: 500 11px/1.2 var(--isx-f-label);
+  letter-spacing: var(--isx-track);
+  text-transform: uppercase;
+  color: var(--isx-text-2);
+  transform: scaleX(1.06);
+  transform-origin: left;
+  display: inline-block;
+}
+.isx-micro { font: 500 10px/1.2 var(--isx-f-label); letter-spacing: 0.18em; color: var(--isx-text-3); }
+.isx-num {
+  font-family: var(--isx-f-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  text-align: right;
+  white-space: nowrap;
+}
+.isx-readout-value { display: flex; align-items: baseline; gap: var(--isx-s1); }
+.isx-readout-value .isx-num { font: 700 20px/1.2 var(--isx-f-num); letter-spacing: 0; }
+.isx-readout--lg .isx-num { font-size: 40px; line-height: 1.1; letter-spacing: -0.01em; }
+.isx-unit { font: 400 11px/1.2 var(--isx-f-label); letter-spacing: 0.14em; color: var(--isx-text-2); text-transform: uppercase; }
+.isx-readout-meta { font: 500 10px/1.2 var(--isx-f-label); letter-spacing: 0.18em; color: var(--isx-text-3); }
+
+/* ---------- 状态条：长度来自 --v ---------- */
+.isx-gauge { display: grid; gap: var(--isx-s1); }
+.isx-gauge-track { height: 2px; background: var(--isx-line-weak); }
+.isx-gauge-fill {
+  height: 2px;
+  width: calc(var(--v, 0) * 100%);
+  background: var(--isx-state, var(--isx-nominal));
+  transition: width var(--isx-dur) var(--isx-ease), background-color 0ms linear;
+}
+.isx-gauge[data-state="caution"] { --isx-state: var(--isx-caution); }
+.isx-gauge[data-state="interrupt"] { --isx-state: var(--isx-interrupt); }
+.isx-gauge[data-state="interrupt"] .isx-gauge-fill {
+  height: 4px;
+  animation: isx-breathe 1000ms steps(2, end) infinite;
+}
+
+/* ---------- 状态点 / 中断条 ---------- */
+.isx-dot { width: 6px; height: 6px; background: var(--isx-nominal); display: inline-block; }
+.isx-dot[data-state="caution"] { background: var(--isx-caution); }
+.isx-dot[data-state="interrupt"] { background: var(--isx-interrupt); }
+.isx-dot[data-state="interrupt"]::after { content: ""; }
+
+.isx-alert {
+  display: flex; align-items: center; gap: var(--isx-s3);
+  border-left: 3px solid var(--isx-caution);
+  background: var(--isx-panel);
+  padding: var(--isx-s2) var(--isx-s3);
+  min-height: var(--isx-row);
+}
+.isx-alert[data-state="interrupt"] { border-left-width: 4px; border-left-color: var(--isx-interrupt); }
+.isx-alert[data-state="nominal"] { border-left-color: var(--isx-nominal); }
+
+/* ---------- 按钮：强调只填充 ---------- */
+.isx-btn {
+  min-height: var(--isx-row);
+  padding: 0 var(--isx-s4);
+  border: var(--isx-hairline) solid var(--isx-line);
+  font: 500 11px/1 var(--isx-f-label);
+  letter-spacing: var(--isx-track);
+  text-transform: uppercase;
+  color: var(--isx-text);
+  cursor: pointer;
+  transition: background-color var(--isx-tick) var(--isx-ease);
+}
+.isx-btn:hover { background: var(--isx-raised); }
+.isx-btn--preset { min-height: 24px; padding: 0 var(--isx-s2); }
+.isx-btn--primary {
+  background: var(--isx-signal);
+  border-color: var(--isx-signal);
+  color: var(--isx-on-signal);
+  font-weight: 700;
+}
+.isx-btn--primary:hover { background: var(--isx-signal-hover); }
+.isx-btn[aria-pressed="true"] { background: var(--isx-signal); color: var(--isx-on-signal); border-color: var(--isx-signal); }
+
+/* ---------- 表 ---------- */
+.isx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.isx-table th, .isx-table td {
+  height: var(--isx-row);
+  padding: 0 var(--isx-s3);
+  border-bottom: var(--isx-hairline) solid var(--isx-line-weak);
+  text-align: left;
+  white-space: nowrap;
+}
+.isx-table thead th {
+  font: 500 11px/1.2 var(--isx-f-label);
+  letter-spacing: var(--isx-track);
+  text-transform: uppercase;
+  color: var(--isx-text-2);
+  border-bottom-color: var(--isx-line);
+}
+.isx-table tbody tr:hover { background: var(--isx-raised); }
+.isx-table .num { text-align: right; font-family: var(--isx-f-num); font-variant-numeric: tabular-nums; }
+.isx-table .mid { text-align: center; }
+
+/* ---------- 结构 ---------- */
+.isx-shell { display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; }
+.isx-top {
+  display: flex; align-items: center; gap: var(--isx-s4);
+  height: var(--isx-s16);
+  padding: 0 var(--isx-s6);
+  border-bottom: var(--isx-hairline) solid var(--isx-line);
+}
+.isx-brand { font: 700 13px/1 var(--isx-f-body); }
+.isx-tabs { display: flex; gap: var(--isx-hairline); margin-left: auto; }
+.isx-tab {
+  height: 32px; padding: 0 var(--isx-s3);
+  display: inline-flex; align-items: center;
+  font: 500 11px/1 var(--isx-f-label); letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--isx-text-2);
+}
+.isx-tab[aria-selected="true"] { background: var(--isx-signal); color: var(--isx-on-signal); font-weight: 700; }
+.isx-main { padding: var(--isx-s6); display: grid; gap: var(--isx-s6); align-content: start; }
+.isx-grid { display: grid; gap: var(--isx-s4); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.isx-foot {
+  height: 40px; display: flex; align-items: center; gap: var(--isx-s4);
+  padding: 0 var(--isx-s6);
+  border-top: var(--isx-hairline) solid var(--isx-line);
+}
+
+/* ---------- 动效 ---------- */
+@keyframes isx-breathe { from { opacity: 1; } to { opacity: 0.72; } }
+@keyframes isx-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.isx-enter { animation: isx-enter var(--isx-enter) var(--isx-ease) both; }
+
+/* ---------- 窄屏重排（720px 以下） ----------
+   五条硬约束不动：切角恒 0 圆角、无 box-shadow、无 gradient、线宽 1px、单一信号色。
+   只做三件事：把 40px 大读数收到 28px、把多列网格压成单列、让顶栏允许换行。 */
+@media (max-width: 720px) {
+  .isx-main { padding: var(--isx-s4); gap: var(--isx-s4); }
+  .isx-grid { grid-template-columns: minmax(0, 1fr); }
+  .isx-top {
+    height: auto;
+    min-height: var(--isx-s12);
+    flex-wrap: wrap;
+    padding: var(--isx-s2) var(--isx-s4);
+    row-gap: var(--isx-s1);
+  }
+  /* 次要标识让位：品牌、主视图与时间戳保留 */
+  .isx-top .isx-micro { display: none; }
+  .isx-tabs { margin-left: 0; }
+  .isx-tab { height: 40px; }
+  /* 触控目标：窄屏上按钮与预设一律 40px 起 */
+  .isx-btn { min-height: 40px; }
+  .isx-btn--preset { min-height: 32px; }
+  .isx-readout--lg .isx-num { font-size: 28px; }
+  .isx-label { transform: none; }
+  /* 表格自己横向滚动，不把页面撑宽 */
+  .isx-card--flush { overflow-x: auto; }
+  .isx-foot { height: auto; min-height: 40px; flex-wrap: wrap; padding: var(--isx-s2) var(--isx-s4); }
+}
+
+/* ---------- 降级 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0ms !important; transition-duration: 0ms !important; }
+  .isx-gauge[data-state="interrupt"] .isx-gauge-fill { animation: none; opacity: 1; }
+}
+:root[data-isx-preset="night-shift"] .isx-gauge[data-state="interrupt"] .isx-gauge-fill { animation: none; }
+
+/* ---------- 打印：状态只能靠形状与文字 ---------- */
+@media print {
+  body { background: #fff; color: #000; }
+  .isx-gauge-fill { background: #000 !important; }
+  .isx-card, .isx-cut { clip-path: none; background: #fff; }
+  .isx-card::before, .isx-cut::before { display: none; }
+}

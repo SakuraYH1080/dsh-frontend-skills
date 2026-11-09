@@ -1,0 +1,8 @@
+display_name: 苹果式极简 · 前端设计
+short_description: 用信息层级、留白阶梯与滚动叙事把长页排成有节奏的阅读路径，而不是套一层白底大标题。
+brand_color: "#0A0A0C"
+default_prompt: >-
+  用 frontend-apple-minimal 重排这个页面：先给我 4–7 条一句话主张定 section，再按 8pt 网格和
+  64/96/128/160 的间距阶梯排布，正文栏宽 600px，字阶从 1.25 或 1.333 选一套，
+  强调色只留 #0A6CFF 一个，动效从 120/240/400/650ms 取并只动 transform 与 opacity。
+  交付前逐条过 SKILL.md 第六节的检查清单。

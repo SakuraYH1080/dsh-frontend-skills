@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>立绘舞台 · A 模型（角色在界面之后）</title>
+<link rel="stylesheet" href="../assets/anime.css">
+<style>
+  /* 只放本页私有的版式，材质与层结构全部来自 anime.css */
+  .af-stage { padding: 0; }
+  .af-brand { position: absolute; left: 32px; top: 28px; z-index: 20; display: flex; gap: 12px; align-items: center; }
+  .af-brand b { font-size: 15px; letter-spacing: .04em; }
+  .af-brand span { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .55; }
+  .af-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 0; }
+  .af-facts dt { font-size: 11px; letter-spacing: .12em; opacity: .5; margin: 0 0 3px; }
+  .af-facts dd { margin: 0; font-size: 14px; }
+  .af-credit { position: absolute; left: 24px; right: 24px; bottom: 14px; z-index: 20; font-size: 11px; line-height: 1.6; opacity: .55; }
+  @media (max-width: 640px) { .af-credit { position: relative; left: auto; right: auto; bottom: auto; padding: 0 16px 24px; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <linearGradient id="af-pl-hair" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#2B2440"/><stop offset="0.55" stop-color="#4B3E6B"/><stop offset="1" stop-color="#6B5A8F"/>
+    </linearGradient>
+    <linearGradient id="af-pl-coat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B3456"/><stop offset="1" stop-color="#1A1728"/>
+    </linearGradient>
+    <linearGradient id="af-pl-skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6DFD2"/><stop offset="1" stop-color="#E8C6B4"/>
+    </linearGradient>
+  </defs>
+</svg>
+<main class="af-stage af-preset-stage af-anim">
+  <!-- L0 背景环境：只有色块、渐变、地面线 -->
+  <div class="af-l0" aria-hidden="true"></div>
+
+  <!-- L1 角色：单张立绘，z=10，面板 z=20 会挡住它 -->
+  <div class="af-char">
+    <svg class="af-char__img" viewBox="0 0 400 600" preserveAspectRatio="xMidYMin meet" role="img" aria-label="角色立绘占位，生产环境替换为正式素材">
+      <!-- 后发 -->
+      <path d="M200 60c-58 0-102 44-104 104-1 34 6 62 14 92 6 22 8 40 4 54h-38c10-26 12-52 6-84-8-44-16-84-8-124 12-62 62-102 126-102z" fill="url(#af-pl-hair)" opacity=".92"/>
+      <!-- 身体 -->
+      <path d="M200 250c56 0 96 22 108 62l26 92c6 22 2 34-14 40l-40 14v102H120V458l-40-14c-16-6-20-18-14-40l26-92c12-40 52-62 108-62z" fill="url(#af-pl-coat)"/>
+      <!-- 领口 -->
+      <path d="M200 250l-34 30 34 44 34-44z" fill="#F7F1F6" opacity=".85"/>
+      <!-- 颈 -->
+      <path d="M180 214h40v42c0 8-40 8-40 0z" fill="#E8C6B4"/>
+      <!-- 脸 -->
+      <path d="M200 96c46 0 74 34 74 82 0 56-32 96-74 96s-74-40-74-96c0-48 28-82 74-82z" fill="url(#af-pl-skin)"/>
+      <!-- 前发 -->
+      <path d="M200 74c54 0 92 34 96 82 2 22-4 36-10 44-4-30-12-48-26-58-10-8-22-6-30 6-10 14-16 20-30 20-16 0-24-12-32-26-6-10-14-14-24-8-14 8-20 26-24 50-8-10-12-24-10-44 4-48 42-66 90-66z" fill="url(#af-pl-hair)"/>
+      <!-- 眼 -->
+      <ellipse cx="170" cy="188" rx="9" ry="12" fill="#2A2440"/>
+      <ellipse cx="230" cy="188" rx="9" ry="12" fill="#2A2440"/>
+      <circle cx="173" cy="184" r="3" fill="#FFF"/>
+      <circle cx="233" cy="184" r="3" fill="#FFF"/>
+      <!-- 帽饰 / 发带：给角色一个可指认的识别点 -->
+      <rect x="232" y="120" width="46" height="12" rx="6" fill="#FF5C8A" opacity=".9" transform="rotate(-18 232 120)"/>
+    </svg>
+  </div>
+
+  <div class="af-brand">
+    <b>ASTRA · 角色档案</b>
+    <span>Profile / 001</span>
+  </div>
+
+  <!-- L2 界面面板：左侧主叙事，右侧参数 -->
+  <section class="af-panel af-panel--left">
+    <p class="af-sub">Archive 001</p>
+    <h1 class="af-title">黎明的记录者</h1>
+    <div class="af-scrim">
+      <p class="af-body">她记得每一次日出，却不记得自己从哪里来。档案里只写了三行字：抵达、记录、离开，然后是一个被划掉的日期。</p>
+    </div>
+    <div class="af-actions">
+      <button class="af-btn af-btn--accent" type="button">展开档案</button>
+      <button class="af-btn af-btn--ghost" type="button">语音片段</button>
+    </div>
+  </section>
+
+  <aside class="af-panel af-panel--right">
+    <p class="af-sub">Parameters</p>
+    <dl class="af-facts">
+      <div><dt>定位</dt><dd>观测员</dd></div>
+      <div><dt>所属</dt><dd>第七码头</dd></div>
+      <div><dt>身高</dt><dd>168 cm</dd></div>
+      <div><dt>识别点</dt><dd>左鬓发带</dd></div>
+      <div><dt>首次出现</dt><dd>第三节</dd></div>
+      <div><dt>关系模型</dt><dd>A · 之后</dd></div>
+    </dl>
+  </aside>
+
+  <!-- L3 前景氛围：只放光斑，不拦指针 -->
+  <div class="af-l3" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+  <!-- ① 打开控制台跑 AnimeFusion.init('.af-stage') 会打印禁区相交报告；本页右面板已让出头部矩形 -->
+  <p class="af-credit">素材：占位几何图（本 skill 原创 SVG，可自由替换）。上线前把 .af-char__img 换成正式立绘，并在 references/60-copyright.md 记录来源、授权类型、可否商用、署名文本四项。</p>
+</main>
+<script src="../assets/anime.js"></script>
+<script>
+  /* A 模型的动效只做视差、视线、表情三件事；禁区检测在 init 内已排期一次 */
+  if (window.AnimeFusion) { window.AnimeFusion.init(".af-stage", { parallax: 0.45 }); }
+  /* 按 F 开 / 关头部禁区框。几何与 anime.js 的 forbidCheck 完全一致（0.62 × 0.26、从 --af-headroom 起算），
+     所以框里出现面板，就等于 forbidCheck 会报警。 */
+  (function () {
+    var box = document.createElement("div");
+    box.setAttribute("aria-hidden", "true");
+    box.style.cssText = "position:fixed;display:none;border:1px dashed #FF5C8A;background:rgba(255,92,138,.14);z-index:9999;pointer-events:none";
+    document.body.appendChild(box);
+    function draw() {
+      var stage = document.querySelector(".af-stage");
+      var char = document.querySelector(".af-char");
+      if (!stage || !char) return;
+      var c = char.getBoundingClientRect();
+      var hr = (parseFloat(getComputedStyle(stage).getPropertyValue("--af-headroom")) || 10) / 100;
+      var w = c.width * 0.62;
+      var h = c.height * 0.26;
+      box.style.left = (c.left + c.width * 0.5 - w / 2) + "px";
+      box.style.top = (c.top + c.height * hr) + "px";
+      box.style.width = w + "px";
+      box.style.height = h + "px";
+    }
+    addEventListener("keydown", function (e) {
+      if (e.key !== "f" && e.key !== "F") return;
+      var on = box.style.display !== "block";
+      box.style.display = on ? "block" : "none";
+      if (on) draw();
+    });
+    addEventListener("resize", function () { if (box.style.display === "block") draw(); });
+  })();
+
+</script>
+</body>
+</html>

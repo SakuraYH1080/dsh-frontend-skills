@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vessel 文档 · 三栏文档站模板</title>
+<meta name="description" content="frontend-apple-minimal 的文档站模板：240 / 600 / 200 三栏，左右栏 sticky，中栏 600px 栏宽。">
+<link rel="stylesheet" href="../assets/apple-minimal.css">
+<style>
+  /* 三栏：240 / 600 / 200。中栏永远 600px —— 中文一行 35 字，回读不丢行 */
+  .docs-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, var(--measure)) 200px;
+    gap: var(--gap-4);
+    justify-content: center;
+    align-items: start;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    padding-block-start: var(--gap-4);
+  }
+  .docs-nav, .docs-aside { padding-block: var(--section-xs); }
+  .docs-body { padding-block: var(--section-xs); min-width: 0; }
+  .docs-nav a, .docs-aside a { display: block; padding: 10px 0; color: var(--ink-2); text-decoration: none; font-size: var(--fs-small); }
+  .docs-nav a[aria-current="true"] { color: var(--ink); font-weight: 600; }
+  .docs-nav a:hover, .docs-aside a:hover { color: var(--ink); }
+  .docs-nav .group { margin-bottom: var(--gap-3); }
+  .docs-nav .group-title { font-size: var(--fs-caption); color: var(--ink-3); margin-bottom: var(--gap-1); }
+  .docs-body h2 { margin-top: var(--section-xs); }
+  .docs-body h2:first-child { margin-top: 0; }
+  .docs-body p, .docs-body ul { margin-top: var(--gap-2); color: var(--ink-2); }
+  .docs-body ul { padding-left: 20px; }
+  .docs-body li + li { margin-top: var(--gap-1); }
+  .docs-body code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .callout {
+    margin-top: var(--gap-3);
+    padding: var(--gap-2) var(--gap-3);
+    border-left: 2px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 8px 8px 0;
+    max-width: var(--measure);
+  }
+  .callout p { margin: 0; color: var(--ink-2); }
+
+  /* 900px 以下：右栏收起，240 侧栏折叠成顶部横条 */
+  @media (max-width: 1200px) {
+    .docs-shell { grid-template-columns: 200px minmax(0, 1fr); }
+    .docs-aside { display: none; }
+  }
+  @media (max-width: 900px) {
+    .docs-shell { grid-template-columns: 1fr; padding-block-start: var(--gap-2); }
+    .docs-nav {
+      position: static;
+      display: flex;
+      gap: var(--gap-3);
+      overflow-x: auto;
+      padding-block: var(--gap-2);
+      border-bottom: 1px solid var(--line);
+    }
+    .docs-nav .group { margin: 0; display: flex; gap: var(--gap-3); }
+    .docs-nav .group-title { display: none; }
+    /* 竖排链接转横排后，宽度等于文字宽度（30-38px），触控目标不足。
+       横排时给每个条目自己的 44px 触控块，不改字阶与栏宽。 */
+    .docs-nav a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+    .site-header a { display: inline-flex; align-items: center; min-height: 44px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主内容</a>
+
+<header class="site-header" data-header>
+  <div class="container-wide" style="display:flex;align-items:center;justify-content:space-between;gap:var(--gap-2)">
+    <a href="#main" style="font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-0.02em">Vessel 文档</a>
+    <span style="font-size:var(--fs-caption);color:var(--ink-3)">v1.0 · 2026-11</span>
+  </div>
+</header>
+
+<div class="docs-shell">
+
+  <!-- 左栏 240px：目录树，sticky 且自身可滚 -->
+  <nav class="docs-nav sticky-rail" aria-label="文档目录">
+    <div class="group">
+      <p class="group-title">开始</p>
+      <a href="#install" data-toc-link>安装与初始化</a>
+      <a href="#layout" data-toc-link>布局与网格</a>
+    </div>
+    <div class="group">
+      <p class="group-title">设计规则</p>
+      <a href="#type" data-toc-link>字号与字阶</a>
+      <a href="#space" data-toc-link>留白节奏</a>
+      <a href="#scroll" data-toc-link>滚动叙事</a>
+    </div>
+    <div class="group">
+      <p class="group-title">发布</p>
+      <a href="#checklist" data-toc-link>交付检查</a>
+    </div>
+  </nav>
+
+  <!-- 中栏 600px：正文，唯一宽度 -->
+  <main class="docs-body" id="main">
+    <p class="eyebrow" data-reveal>开始</p>
+    <h1 data-reveal style="margin-top:var(--gap-1)">安装与初始化</h1>
+    <p class="lead" style="margin-top:var(--gap-3)">
+      本模板不依赖任何构建工具。把仓库放在本地，用一条命令起静态服务即可。
+    </p>
+
+    <h2 id="install">1. 起本地服务</h2>
+    <p>直接双击 HTML 能看排版，但滚动叙事的 IntersectionObserver 在 <code>file://</code> 下仍可用；只有 ES module 会被拦。</p>
+    <p><code>python3 -m http.server 8000</code>，然后打开 <code>localhost:8000/templates/docs-page.html</code>。</p>
+    <div class="callout">
+      <p>不要把 <code>script</code> 写成 <code>type="module"</code>：本地文件协议下 module 会被 CORS 拦掉，页面会留在未初始化状态。</p>
+    </div>
+
+    <h2 id="layout">2. 布局与网格</h2>
+    <p>所有间距是 8 的倍数。三栏宽度固定为 240 / 600 / 200，中栏不允许拉伸到 720 以上。</p>
+    <ul>
+      <li>600px ÷ 17px ≈ 35.3 个汉字，或 70.6 个英文字符 —— 这是回读时眼睛不丢行的上限。</li>
+      <li>栏间距 32px。缩到 24px 时两栏会被读成一块。</li>
+      <li>右侧 200px 只放锚点与「本页更新于」，不放正文。</li>
+    </ul>
+
+    <h2 id="type">3. 字号与字阶</h2>
+    <p>正文 <code>clamp(16px, 0.125vw + 15.4px, 17px)</code>，行高 1.65。低于 16px 的正文在 1440 屏上会被读成脚注。</p>
+    <p>标题字重 600，字距 <code>-0.03em</code>。中文不要用 700：笔画会在小字号上糊成一团。</p>
+
+    <h2 id="space">4. 留白节奏</h2>
+    <p>同主题两段之间 64px，主题切换 128px，展示级分隔 160px。三个数字之外没有第四种间距。</p>
+    <p>间距一旦全用同一个值，层级就只剩字号在承担 —— 那时再多加一条分割线也没用。</p>
+
+    <h2 id="scroll">5. 滚动叙事</h2>
+    <p>元素进到视口下沿 12% 才算进入，可见面积 15% 才触发。默认态是已显示，脚本只在能跑的时候加 <code>.js-scroll</code>。</p>
+    <div class="callout">
+      <p>不要用滚轮劫持做整段钉住：锚点跳转会失效，浏览器的前进后退也会停在错误位置。</p>
+    </div>
+
+    <h2 id="checklist">6. 交付检查</h2>
+    <ul>
+      <li>每个 section 只有一个主张，能在 8 个字内说清。</li>
+      <li>正文宽度 ≤ 600px，无一处例外。</li>
+      <li>所有间距是 8 的倍数。</li>
+      <li>关掉 JS，页面仍完整可读。</li>
+      <li>「减少动态效果」下没有任何位移。</li>
+    </ul>
+  </main>
+
+  <!-- 右栏 200px：锚点与元信息，sticky -->
+  <aside class="docs-aside sticky-rail" aria-label="本页导航">
+    <p class="group-title" style="font-size:var(--fs-caption);color:var(--ink-3)">本页</p>
+    <a href="#install">起本地服务</a>
+    <a href="#layout">布局与网格</a>
+    <a href="#type">字号与字阶</a>
+    <a href="#space">留白节奏</a>
+    <a href="#scroll">滚动叙事</a>
+    <a href="#checklist">交付检查</a>
+    <p style="margin-top:var(--gap-3);font-size:var(--fs-caption);color:var(--ink-3)">更新于 2026-11-06</p>
+  </aside>
+
+</div>
+
+<footer class="section-xs" style="border-top:1px solid var(--line);margin-top:var(--section-m)">
+  <div class="container-wide" style="display:flex;justify-content:space-between;gap:var(--gap-2);flex-wrap:wrap;font-size:var(--fs-caption);color:var(--ink-3)">
+    <span>Vessel 文档 · 模板示例，内容为占位</span>
+    <span>零外链 · 系统字体栈 · 内联 SVG</span>
+  </div>
+</footer>
+
+<script src="../assets/scroll-narrative.js"></script>
+</body>
+</html>

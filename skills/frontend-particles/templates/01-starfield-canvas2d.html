@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>starfield · Canvas 2D 模板（共享 particles.js）</title>
+<style>
+  /* 系统字体栈，不引外链字体 */
+  :root {
+    --ink: #0b0e14;
+    --paper: #eef3fb;
+    --dot: #cfe3ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #pf {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .mask {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background:
+      radial-gradient(120% 90% at 50% 10%, rgba(11,14,20,0.10), rgba(11,14,20,0.72) 72%),
+      linear-gradient(180deg, rgba(11,14,20,0.35), rgba(11,14,20,0.62));
+  }
+  main {
+    position: relative;
+    z-index: 2;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 96px 32px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7f96b4;
+    margin: 0;
+  }
+  h1 {
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0;
+    font-weight: 600;
+  }
+  p.lead {
+    font-size: 17px;
+    line-height: 1.65;
+    color: #b9c7dc;
+    margin: 0;
+    max-width: 46ch;
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  button {
+    font: inherit;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(207,227,255,0.28);
+    background: rgba(207,227,255,0.06);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  button:hover { background: rgba(207,227,255,0.14); }
+  .hud {
+    position: fixed;
+    left: 24px;
+    bottom: 20px;
+    z-index: 3;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: #7f96b4;
+    line-height: 1.6;
+  }
+  .hud b { color: #cfe3ff; font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) {
+    .hud::after { content: " · reduced-motion：静态帧"; color: #ffd9a0; }
+  }
+  @media (max-width: 560px) {
+    main { padding: 72px 20px; }
+    h1 { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="pf" aria-hidden="true"></canvas>
+<div class="mask" aria-hidden="true"></div>
+
+<main>
+  <p class="eyebrow">frontend-particles · 01</p>
+  <h1>星场：三层视差撑开纵深</h1>
+  <p class="lead">
+    本页不自己写粒子循环，而是引 assets/particles.js 的 ParticleField，
+    用 preset: "starfield" 起一个 220 粒的场。三层由 layers: 3 自动分深度，
+    尺寸、速度、透明度都随 depth 缩放。降级、对象池、可见性暂停全部由共享库负责。
+  </p>
+  <div class="row">
+    <button id="toggle" type="button">暂停</button>
+    <button id="tier" type="button">降一档</button>
+  </div>
+</main>
+
+<div class="hud" id="hud">n <b>–</b> · tier <b>–</b> · dpr <b>–</b> · frames <b>–</b></div>
+
+<script src="../assets/particles.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var canvas = document.getElementById("pf");
+  var hud = document.getElementById("hud");
+  var toggleBtn = document.getElementById("toggle");
+  var tierBtn = document.getElementById("tier");
+
+  if (!window.ParticleField) {
+    hud.textContent = "未加载 ../assets/particles.js";
+    return;
+  }
+
+  /* 与 tokens.json 一致：starfield 220 粒、3 层、指针视差 */
+  var field = window.ParticleField.create({
+    canvas: canvas,
+    preset: "starfield",
+    override: { count: 220, layers: 3, pointer: "parallax" }
+  });
+  field.start();
+
+  var running = !field.reduced;
+  var timer = 0;
+
+  function paint() {
+    hud.innerHTML = "n <b>" + field.list.length +
+      "</b> · tier <b>" + field.tier +
+      "</b> · dpr <b>" + field.dpr +
+      "</b> · frames <b>" + field.frames + "</b>";
+  }
+  paint();
+  timer = setInterval(paint, 400);
+
+  toggleBtn.addEventListener("click", function () {
+    if (running) {
+      field.stop();
+      clearInterval(timer);
+      running = false;
+      toggleBtn.textContent = "继续";
+      paint();
+    } else {
+      field.start();
+      timer = setInterval(paint, 400);
+      running = true;
+      toggleBtn.textContent = "暂停";
+    }
+  });
+
+  /* 手动降档：applyTier 只接受比当前更低的档，档号越大越省 */
+  tierBtn.addEventListener("click", function () {
+    var next = Math.min(field.tier + 1, 3);
+    field.applyTier(next);
+    tierBtn.textContent = "当前档位 " + field.tier;
+    paint();
+  });
+
+  window.addEventListener("pagehide", function () {
+    clearInterval(timer);
+    field.stop();
+  });
+})();
+</script>
+</body>
+</html>

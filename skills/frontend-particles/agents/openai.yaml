@@ -1,0 +1,4 @@
+display_name: 粒子系统
+short_description: 粒子层的生成、运动、交互与性能预算：三条渲染路线、四个变体、四档降级。
+brand_color: "#7C5CFF"
+default_prompt: 用 frontend-particles 给这个页面加一层动态底：先判它该不该有，再选变体与渲染路线、按公式算 particle count，最后补 reduced-motion、低端设备与标签页隐藏三路降级。

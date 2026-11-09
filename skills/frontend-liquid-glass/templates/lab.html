@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>液态玻璃 · 参数实验室</title>
+<link rel="stylesheet" href="../assets/glass.css">
+<style>
+  /* 实验室自己的排版，与材质无关 */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 14px/1.5 -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: #11141A;
+    background:
+      radial-gradient(1100px 620px at 12% 8%, #F7B7D2 0%, transparent 62%),
+      radial-gradient(900px 700px at 86% 22%, #8FD3FF 0%, transparent 58%),
+      radial-gradient(1000px 800px at 46% 96%, #FFE29A 0%, transparent 60%),
+      #EDEFF4;
+    min-height: 100%;
+  }
+  .wrap { display: grid; grid-template-columns: 340px 1fr; gap: 28px; padding: 28px; align-items: start; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+
+  .panel { padding: 20px; }
+  h1 { font-size: 15px; letter-spacing: -.01em; margin: 0 0 4px; }
+  .sub { font-size: 12px; opacity: .62; margin: 0 0 16px; }
+  label { display: block; font-size: 12px; margin: 10px 0 2px; letter-spacing: .01em; }
+  label b { font-variant-numeric: tabular-nums; float: right; font-weight: 500; opacity: .72; }
+  input[type=range] { width: 100%; accent-color: #2563EB; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  button {
+    font: inherit; font-size: 12px; padding: 6px 8px; cursor: pointer;
+    border: 1px solid rgba(0,0,0,.16); border-radius: 8px; background: rgba(255,255,255,.7);
+  }
+  button[aria-pressed="true"] { background: #11141A; color: #fff; border-color: #11141A; }
+
+  .readout { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(0,0,0,.10); font-size: 12px; }
+  .readout table { width: 100%; border-collapse: collapse; }
+  .readout td { padding: 3px 0; }
+  .readout td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .ok { color: #0F7B3F; } .bad { color: #B42318; }
+
+  /* 演示区 */
+  .stage { position: relative; min-height: 620px; display: grid; place-items: center; padding: 40px; }
+  .demo { width: min(520px, 100%); padding: 22px; }
+  .demo h2 { margin: 0 0 6px; font-size: 18px; letter-spacing: -.015em; }
+  .demo p { margin: 0 0 14px; font-size: 13px; opacity: .82; }
+  .demo .kv { display: flex; justify-content: space-between; font-size: 12px; padding: 7px 0; border-top: 1px solid rgba(0,0,0,.08); }
+  .caption { position: absolute; left: 40px; bottom: 30px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="panel lg" data-lg-preset="standard">
+    <h1>液态玻璃 · 九个旋钮</h1>
+    <p class="sub">拖动即改 CSS 变量。对比度按最亮 / 最暗两种极端背景各算一次。</p>
+
+    <label>blur <b id="v-blur">24px</b></label>
+    <input id="blur" type="range" min="0" max="60" step="1" value="24">
+
+    <label>saturate <b id="v-saturate">160%</b></label>
+    <input id="saturate" type="range" min="80" max="240" step="5" value="160">
+
+    <label>brightness <b id="v-brightness">112%</b></label>
+    <input id="brightness" type="range" min="80" max="140" step="1" value="112">
+
+    <label>tint α <b id="v-tint">0.42</b></label>
+    <input id="tint" type="range" min="0" max="1" step="0.01" value="0.42">
+
+    <label>border α <b id="v-border">0.40</b></label>
+    <input id="border" type="range" min="0" max="1" step="0.01" value="0.40">
+
+    <label>highlight α <b id="v-hl">0.70</b></label>
+    <input id="hl" type="range" min="0" max="1" step="0.01" value="0.70">
+
+    <label>refraction scale <b id="v-refract">9</b></label>
+    <input id="refract" type="range" min="0" max="18" step="1" value="9">
+
+    <label>noise α <b id="v-noise">0.045</b></label>
+    <input id="noise" type="range" min="0" max="0.12" step="0.005" value="0.045">
+
+    <label>radius <b id="v-radius">18px</b></label>
+    <input id="radius" type="range" min="0" max="40" step="1" value="18">
+
+    <div class="row">
+      <button data-preset="thin">thin</button>
+      <button data-preset="standard" aria-pressed="true">standard</button>
+      <button data-preset="deep">deep</button>
+      <button data-preset="frost">frost</button>
+    </div>
+
+    <div class="readout">
+      <table>
+        <tr><td>对比度 · 最亮背景</td><td id="c-white">—</td></tr>
+        <tr><td>对比度 · 最暗背景</td><td id="c-black">—</td></tr>
+        <tr><td>承载层 α（scrim）</td><td id="c-scrim">—</td></tr>
+        <tr><td>结论</td><td id="c-verdict">—</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="stage">
+    <article class="demo lg" id="demo" data-lg-preset="standard">
+      <div class="lg-scrim" aria-hidden="true"></div>
+      <h2>材料是被背景证明的</h2>
+      <p>这块面板离你更近，所以它模糊了后面的颜色，又在边缘留下 1px 的受光。</p>
+      <div class="kv"><span>采样率</span><span>48 kHz</span></div>
+      <div class="kv"><span>缓冲</span><span>128 samples</span></div>
+      <div class="kv"><span>延迟</span><span>2.7 ms</span></div>
+    </article>
+    <div class="caption">background is the evidence</div>
+  </section>
+</div>
+
+<script src="../assets/glass.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var demo = document.getElementById("demo");
+  var state = { blur: 24, saturate: 160, brightness: 112, tint: 0.42, border: 0.40,
+                hl: 0.70, refract: 9, noise: 0.045, radius: 18 };
+
+  /* —— WCAG 相对亮度 —— */
+  function lin(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function lum(r, g, b) { return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b); }
+  function ratio(a, b) { var hi = Math.max(a, b), lo = Math.min(a, b); return (hi + 0.05) / (lo + 0.05); }
+  function over(fg, alpha, bg) {
+    return [0, 1, 2].map(function (i) { return fg[i] * alpha + bg[i] * (1 - alpha); });
+  }
+
+  /* tint 白 #FFFFFF α 覆在背景上；再叠 scrim（α = tint + 0.18）得到文字真正坐的底 */
+  function compositeAlpha() {
+    // 两层同色叠加的有效不透明度：1-(1-a)(1-b)
+    var scrim = 1 - (1 - state.tint) * (1 - Math.min(1, state.tint + 0.18));
+    return scrim;
+  }
+
+  var TEXT = [17, 20, 26]; // #11141A
+
+  function refresh() {
+    var a = compositeAlpha();
+    [["white", [255, 255, 255]], ["black", [0, 0, 0]]].forEach(function (pair) {
+      var key = pair[0], bg = pair[1];
+      var base = over([255, 255, 255], state.tint, bg);          // 玻璃自身
+      var seated = over(base, Math.min(1, state.tint + 0.18), bg); // 再垫承载层
+      var lt = lum(TEXT[0], TEXT[1], TEXT[2]);
+      var lb = lum(seated[0], seated[1], seated[2]);
+      var r = ratio(lt, lb);
+      var cell = document.getElementById("c-" + key);
+      cell.textContent = r.toFixed(2) + " : 1";
+      cell.className = r >= 4.5 ? "ok" : "bad";
+    });
+    document.getElementById("c-scrim").textContent = a.toFixed(2);
+    var worst = Math.min(
+      parseFloat(document.getElementById("c-white").textContent),
+      parseFloat(document.getElementById("c-black").textContent)
+    );
+    var v = document.getElementById("c-verdict");
+    v.textContent = worst >= 4.5 ? "可用（最暗侧 " + worst.toFixed(2) + "）" : "正文不合格（最暗侧 " + worst.toFixed(2) + "）";
+    v.className = worst >= 4.5 ? "ok" : "bad";
+  }
+
+  function apply() {
+    root.style.setProperty("--lg-blur", state.blur + "px");
+    root.style.setProperty("--lg-saturate", state.saturate + "%");
+    root.style.setProperty("--lg-brightness", state.brightness + "%");
+    root.style.setProperty("--lg-tint-alpha", state.tint);
+    root.style.setProperty("--lg-border-alpha", state.border);
+    root.style.setProperty("--lg-highlight-alpha", state.hl);
+    root.style.setProperty("--lg-noise", state.noise);
+    root.style.setProperty("--lg-radius", state.radius + "px");
+    demo.style.setProperty("--lg-blur", state.blur + "px");
+    demo.style.setProperty("--lg-saturate", state.saturate + "%");
+    demo.style.setProperty("--lg-brightness", state.brightness + "%");
+    demo.style.setProperty("--lg-tint-alpha", state.tint);
+    demo.style.setProperty("--lg-border-alpha", state.border);
+    demo.style.setProperty("--lg-highlight-alpha", state.hl);
+    demo.style.setProperty("--lg-noise", state.noise);
+    demo.style.setProperty("--lg-radius", state.radius + "px");
+    document.getElementById("v-blur").textContent = state.blur + "px";
+    document.getElementById("v-saturate").textContent = state.saturate + "%";
+    document.getElementById("v-brightness").textContent = state.brightness + "%";
+    document.getElementById("v-tint").textContent = state.tint.toFixed(2);
+    document.getElementById("v-border").textContent = state.border.toFixed(2);
+    document.getElementById("v-hl").textContent = state.hl.toFixed(2);
+    document.getElementById("v-refract").textContent = state.refract;
+    document.getElementById("v-noise").textContent = state.noise.toFixed(3);
+    document.getElementById("v-radius").textContent = state.radius + "px";
+    refresh();
+  }
+
+  [["blur", "blur", 1], ["saturate", "saturate", 1], ["brightness", "brightness", 1],
+   ["tint", "tint", 0.01], ["border", "border", 0.01], ["hl", "hl", 0.01],
+   ["refract", "refract", 1], ["noise", "noise", 0.005], ["radius", "radius", 1]]
+    .forEach(function (row) {
+      var el = document.getElementById(row[0]);
+      el.addEventListener("input", function () {
+        state[row[1]] = parseFloat(el.value);
+        apply();
+      });
+    });
+
+  /* 预设：数值与 assets/tokens.json 严格一致 */
+  var PRESETS = {
+    thin:     { blur: 12, saturate: 130, brightness: 108, tint: 0.28, border: 0.34, hl: 0.55, noise: 0.035 },
+    standard: { blur: 24, saturate: 160, brightness: 112, tint: 0.42, border: 0.40, hl: 0.70, noise: 0.045 },
+    deep:     { blur: 40, saturate: 180, brightness: 116, tint: 0.55, border: 0.46, hl: 0.85, noise: 0.055 },
+    frost:    { blur: 8,  saturate: 100, brightness: 104, tint: 0.72, border: 0.28, hl: 0.40, noise: 0.030 }
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-preset]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var p = PRESETS[btn.dataset.preset];
+      Object.keys(p).forEach(function (k) { state[k] = p[k]; });
+      document.getElementById("blur").value = state.blur;
+      document.getElementById("saturate").value = state.saturate;
+      document.getElementById("brightness").value = state.brightness;
+      document.getElementById("tint").value = state.tint;
+      document.getElementById("border").value = state.border;
+      document.getElementById("hl").value = state.hl;
+      document.getElementById("noise").value = state.noise;
+      Array.prototype.forEach.call(document.querySelectorAll("[data-preset]"), function (b) {
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      apply();
+    });
+  });
+
+  /* 折射：真滤镜由 glass.js 注入；不支持则保持关闭，绝不假装 */
+  LiquidGlass.init({ refract: true, guard: false, scale: state.refract });
+  document.getElementById("refract").addEventListener("input", function (e) {
+    var f = document.querySelector("#lg-refract feDisplacementMap");
+    if (f) f.setAttribute("scale", e.target.value);
+    state.refract = parseFloat(e.target.value);
+    apply();
+  });
+
+  if (LiquidGlass.supportsBackdrop()) demo.setAttribute("data-lg-refract", "on");
+  apply();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vessel · 产品发布页模板</title>
+<meta name="description" content="frontend-apple-minimal 的极简产品发布页模板：纯排版 hero、主张→特写→参数→CTA 四段、零外链。">
+<link rel="stylesheet" href="../assets/apple-minimal.css">
+<style>
+  /* 本页私有：只有两处，其余全部来自 apple-minimal.css */
+  .hero { padding-block: clamp(88px, 11vw, 160px) var(--section-m); }
+  .hero-figure { margin-top: var(--section-xs); }
+  .swatch-row { display: flex; gap: var(--gap-2); flex-wrap: wrap; margin-top: var(--gap-3); }
+  .swatch { width: 56px; height: 56px; border-radius: 12px; border: 1px solid var(--line); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-4); }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; gap: var(--gap-3); } }
+  .feature h3 { margin-bottom: var(--gap-1); }
+  .feature p { color: var(--ink-2); max-width: var(--measure-narrow); }
+  .cta-block { text-align: center; }
+  .cta-actions { display: flex; gap: var(--gap-2); justify-content: center; flex-wrap: wrap; margin-top: var(--gap-3); }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主内容</a>
+
+<header class="site-header" data-header>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:var(--gap-2)">
+    <a href="#top" style="font-weight:600;color:var(--ink);text-decoration:none;letter-spacing:-0.02em">Vessel</a>
+    <nav aria-label="主导航" style="display:flex;gap:var(--gap-3);font-size:var(--fs-small)">
+      <a href="#features" style="color:var(--ink-2);text-decoration:none">特写</a>
+      <a href="#specs" style="color:var(--ink-2);text-decoration:none">参数</a>
+      <a href="#buy" style="color:var(--ink-2);text-decoration:none">购买</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 第一段 · 主张：纯排版 hero（结构 C）。一屏只说一句话 -->
+  <section class="hero container" id="top">
+    <p class="eyebrow" data-reveal>2026 · 新版</p>
+    <h1 class="measure" data-reveal style="margin-top:var(--gap-2)">一克不多<br>一克不少</h1>
+    <p class="lead measure" data-reveal style="margin-top:var(--gap-3)">
+      Vessel 把结构、电池与屏幕压进 412 克。它不试图成为一台更小的电脑，
+      而是成为一件拿起来就想用的东西。
+    </p>
+    <div class="cta-actions" data-reveal style="margin-top:var(--gap-4)">
+      <a class="btn" href="#buy">￥8,999 起</a>
+      <a class="btn btn-ghost" href="#features">看它做了什么</a>
+    </div>
+
+    <!-- 全幅媒体（结构 A）：纯 SVG 生成，无第三方图片 -->
+    <div class="hero-figure container-wide bleed" data-parallax="0.25">
+      <svg viewBox="0 0 1120 560" role="img" aria-label="Vessel 正视图：一块 16:10 的圆角矩形屏幕，下方一条细边">
+        <defs>
+          <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#EDEDEF"></stop>
+            <stop offset="1" stop-color="#C6C6CB"></stop>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="1120" height="560" fill="#F8F8F9"></rect>
+        <rect x="240" y="96" width="640" height="368" rx="24" fill="url(#screen)" stroke="#C6C6CB"></rect>
+        <rect x="288" y="144" width="320" height="16" rx="8" fill="#9A9AA1"></rect>
+        <rect x="288" y="184" width="216" height="16" rx="8" fill="#C6C6CB"></rect>
+        <rect x="520" y="432" width="80" height="6" rx="3" fill="#9A9AA1"></rect>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 第二段 · 特写（2–4 条，不要更多） -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2 class="measure" data-reveal>三个决定，其余的都跟着它走</h2>
+      <div class="grid-3" style="margin-top:var(--gap-4)">
+        <div class="feature" data-reveal>
+          <h3>412 克</h3>
+          <p data-num="412">整机重量。比同尺寸产品轻 118 克，代价是电池从 62Wh 降到 54Wh。</p>
+        </div>
+        <div class="feature" data-reveal>
+          <h3>7.8 小时</h3>
+          <p data-num="7.8">连续办公续航。我们选择在这个数字上停手，而不是把厚度加到 14mm。</p>
+        </div>
+        <div class="feature" data-reveal>
+          <h3>一块屏</h3>
+          <p data-num="1">没有第二块屏。所有状态回到这一块 16:10 的 2400×1500 上。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 分栏特写：文字在左、产品在右（结构 B，5fr / 7fr） -->
+  <section class="section-xs">
+    <div class="container">
+      <div class="split">
+        <div data-reveal>
+          <h2>铰链只做一件事</h2>
+          <p class="lead" style="margin-top:var(--gap-3)">
+            单轴阻尼 0.42 N·m，从 0° 到 135° 全程力矩偏差小于 6%。
+            你不用找角度，松手它就停在那里。
+          </p>
+        </div>
+        <figure class="figure" data-reveal>
+          <svg viewBox="0 0 600 400" role="img" aria-label="铰链侧视示意：两段外壳以单轴相连"
+               style="aspect-ratio:16/10;width:100%;border-radius:16px;background:var(--surface)">
+            <rect x="96" y="120" width="200" height="24" rx="12" fill="#73737B"></rect>
+            <rect x="300" y="120" width="200" height="24" rx="12" fill="#4C4C53"></rect>
+            <circle cx="300" cy="132" r="16" fill="none" stroke="#0A6CFF" stroke-width="2"></circle>
+            <path d="M300 132 L404 60" stroke="#C6C6CB" stroke-width="2" stroke-dasharray="6 6" fill="none"></path>
+          </svg>
+          <figcaption>单轴阻尼结构。虚线为 135° 最大开合角。</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三段 · 参数：一张两列表，44px 行高，值右对齐等宽数字 -->
+  <section class="section" id="specs">
+    <div class="container">
+      <h2 data-reveal>参数</h2>
+      <hr class="rule" style="margin-block:var(--gap-4)">
+      <table class="spec">
+        <caption class="visually-hidden">Vessel 主要规格</caption>
+        <tbody>
+          <tr><th scope="row">机身</th><td>412 g · 296 × 208 × 12.4 mm</td></tr>
+          <tr><th scope="row">屏幕</th><td>13.6&quot; 2400 × 1500 · 500 nit</td></tr>
+          <tr><th scope="row">电池</th><td>54 Wh · 7.8 h 办公续航</td></tr>
+          <tr><th scope="row">接口</th><td>2 × USB-C · 1 × 3.5 mm</td></tr>
+          <tr><th scope="row">配色</th><td>石墨 / 银 / 雾蓝</td></tr>
+        </tbody>
+      </table>
+
+      <div class="swatch-row" aria-label="配色">
+        <span class="swatch" style="background:#31313A"></span>
+        <span class="swatch" style="background:#C6C6CB"></span>
+        <span class="swatch" style="background:#9A9AA1"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四段 · CTA：一屏只留一个动作 -->
+  <section class="section-l cta-block" id="buy">
+    <div class="container">
+      <h2 data-reveal>从 ￥8,999 起</h2>
+      <p class="lead measure" data-reveal style="margin:var(--gap-3) auto 0">
+        三档配置，同一天发货。不支持分期以外的任何附加服务。
+      </p>
+      <div class="cta-actions" data-reveal>
+        <a class="btn" href="#top">选择配置</a>
+        <a class="btn btn-ghost" href="#specs">再看一遍参数</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="section-xs" style="border-top:1px solid var(--line)">
+  <div class="container" style="display:flex;justify-content:space-between;gap:var(--gap-2);flex-wrap:wrap;font-size:var(--fs-caption);color:var(--ink-3)">
+    <span>Vessel · 模板示例，内容为占位</span>
+    <span>本页零外链：字体用系统栈，图形用内联 SVG</span>
+  </div>
+</footer>
+
+<script src="../assets/scroll-narrative.js"></script>
+</body>
+</html>

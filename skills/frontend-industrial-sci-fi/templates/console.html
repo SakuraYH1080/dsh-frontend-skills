@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-isx-preset="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RE-STATION · 操作台 / Console</title>
+<link rel="stylesheet" href="../assets/industrial.css">
+</head>
+<body class="isx-shell">
+
+<!-- ===== 顶栏：品牌 + 通道灯 + 标签 + 时钟 ===== -->
+<header class="isx-top">
+  <span class="isx-brand">RE-STATION</span>
+  <span class="isx-micro">RHINE / ENDFIELD JOINT UNIT</span>
+  <span class="isx-dot" data-state="nominal" aria-hidden="true"></span>
+  <span class="isx-micro">LINK</span>
+
+  <nav class="isx-tabs" role="tablist" aria-label="主视图">
+    <button class="isx-tab" role="tab" aria-selected="true">控制 / CONTROL</button>
+    <button class="isx-tab" role="tab" aria-selected="false">采样 / SAMPLE</button>
+    <button class="isx-tab" role="tab" aria-selected="false">日志 / LOG</button>
+  </nav>
+
+  <span class="isx-micro"><span data-isx-stamp="time">--:--:--</span> UTC+8</span>
+</header>
+
+<!-- ===== 主区 ===== -->
+<main class="isx-main">
+
+  <!-- 分区 A：回路读数（2 列大读数） -->
+  <section class="isx-card isx-enter" aria-labelledby="z-a">
+    <div class="isx-zone-head">
+      <span class="isx-zone-id">SYS-03 · SEC.A</span>
+      <h2 class="isx-zone-title" id="z-a">冷却回路 <span>COOLANT LOOP</span></h2>
+      <span class="isx-zone-count">2 / 2</span>
+    </div>
+
+    <div class="isx-grid">
+
+      <div class="isx-gauge" style="--v:0.72" data-state="nominal">
+        <span class="isx-label">入口压力 INLET</span>
+        <div class="isx-readout-value isx-readout--lg">
+          <span class="isx-num" data-v="72.4">72.4</span>
+          <span class="isx-unit">kPa</span>
+        </div>
+        <div class="isx-gauge-track"><div class="isx-gauge-fill"></div></div>
+        <span class="isx-readout-meta">±0.2 / 10s AVG</span>
+      </div>
+
+      <div class="isx-gauge" style="--v:0.44" data-state="caution">
+        <span class="isx-label">回流温度 RETURN</span>
+        <div class="isx-readout-value isx-readout--lg">
+          <span class="isx-num" data-v="44.8">44.8</span>
+          <span class="isx-unit">°C</span>
+        </div>
+        <div class="isx-gauge-track"><div class="isx-gauge-fill"></div></div>
+        <span class="isx-readout-meta">阈值 42.0 · 超出 2.8</span>
+      </div>
+
+    </div>
+
+    <p class="isx-readout-meta" style="margin:12px 0 0">
+      采样时刻 <span data-isx-stamp="datetime">----</span> · 精度 0.1 · 置信度 0.98
+    </p>
+  </section>
+
+  <!-- 分区 B：采样阵列（表） -->
+  <section class="isx-card isx-card--flush isx-enter" aria-labelledby="z-b">
+    <div class="isx-zone-head" style="padding:16px 16px 0;margin-bottom:0">
+      <span class="isx-zone-id">SYS-03 · SEC.B</span>
+      <h2 class="isx-zone-title" id="z-b">采样阵列 <span>SAMPLE ARRAY</span></h2>
+      <span class="isx-zone-count">04 / 04</span>
+    </div>
+
+    <table class="isx-table">
+      <thead>
+        <tr>
+          <th>编号 ID</th>
+          <th>介质 MEDIUM</th>
+          <th class="num">浓度 CONC.</th>
+          <th class="num">偏差 DEV.</th>
+          <th class="mid">状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="isx-num">CH-0147</td>
+          <td>原液 RAW</td>
+          <td class="num">98.41 %</td>
+          <td class="num">+0.02</td>
+          <td class="mid"><span class="isx-dot" data-state="nominal"></span> 正常</td>
+        </tr>
+        <tr>
+          <td class="isx-num">CH-0148</td>
+          <td>原液 RAW</td>
+          <td class="num">97.06 %</td>
+          <td class="num">−0.31</td>
+          <td class="mid"><span class="isx-dot" data-state="nominal"></span> 正常</td>
+        </tr>
+        <tr>
+          <td class="isx-num">CH-0149</td>
+          <td>稀释 DIL.</td>
+          <td class="num">41.20 %</td>
+          <td class="num">−1.84</td>
+          <td class="mid"><span class="isx-dot" data-state="caution"></span> 警告</td>
+        </tr>
+        <tr>
+          <td class="isx-num">CH-0150</td>
+          <td>残渣 RES.</td>
+          <td class="num">— </td>
+          <td class="num">— </td>
+          <td class="mid"><span class="isx-dot" data-state="interrupt"></span> 中断</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 分区 C：中断与操作 -->
+  <section class="isx-card isx-enter" aria-labelledby="z-c">
+    <div class="isx-zone-head">
+      <span class="isx-zone-id">SYS-03 · SEC.C</span>
+      <h2 class="isx-zone-title" id="z-c">中断通道 <span>INTERRUPT</span></h2>
+      <span class="isx-zone-count">1 ACTIVE</span>
+    </div>
+
+    <div class="isx-alert" data-state="interrupt" role="alert">
+      <span class="isx-dot" data-state="interrupt" aria-hidden="true"></span>
+      <strong style="font-size:13px">CH-0150 采样中断</strong>
+      <span class="isx-micro" style="margin-left:auto">CODE 0x2E · <span data-isx-stamp="time">--:--:--</span></span>
+    </div>
+
+    <div class="isx-alert" data-state="caution" style="margin-top:8px">
+      <span class="isx-dot" data-state="caution" aria-hidden="true"></span>
+      <span style="font-size:13px">CH-0149 浓度低于下限 1.84 个百分点</span>
+      <span class="isx-micro" style="margin-left:auto">UNACK</span>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="isx-btn isx-btn--primary" id="ack">确认中断 ACK</button>
+      <button class="isx-btn" id="pulse">注入模拟读数 PULSE</button>
+      <button class="isx-btn" id="reset">复位 RESET</button>
+    </div>
+
+    <p class="isx-micro" style="margin:16px 0 0">
+      状态通道只升不降：RAISE 立即生效，回落必须经过 ACK。
+    </p>
+  </section>
+
+</main>
+
+<!-- ===== 底栏：预设 + 状态机读数 ===== -->
+<footer class="isx-foot">
+  <span class="isx-micro">PRESET</span>
+  <button class="isx-btn isx-btn--preset" data-isx-set-preset="standard">STANDARD</button>
+  <button class="isx-btn isx-btn--preset" data-isx-set-preset="cold-store">COLD-STORE</button>
+  <button class="isx-btn isx-btn--preset" data-isx-set-preset="site">SITE</button>
+  <button class="isx-btn isx-btn--preset" data-isx-set-preset="night-shift">NIGHT-SHIFT</button>
+
+  <span class="isx-micro" style="margin-left:auto">
+    STATE <b class="isx-num" id="state">NOMINAL</b> · PEAK <b class="isx-num" id="peak">NOMINAL</b>
+  </span>
+</footer>
+
+<script src="../assets/industrial.js"></script>
+<script>
+(function () {
+  var sm = new ISX.StateMachine("INTERRUPT");   // 开场即最高态：中断未确认
+  var stateEl = document.getElementById("state");
+  var peakEl = document.getElementById("peak");
+
+  sm.on(function (s) {
+    stateEl.textContent = s.current;
+    peakEl.textContent = s.peak;
+  });
+
+  // 首帧：让 DOM 与状态机对齐
+  stateEl.textContent = sm.current;
+  peakEl.textContent = sm.peak;
+
+  document.getElementById("ack").addEventListener("click", function () {
+    sm.acknowledge("CAUTION");                  // 唯一合法降级路径
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    sm.acknowledge("NOMINAL");
+  });
+
+  var t = 0;
+  document.getElementById("pulse").addEventListener("click", function () {
+    t = (t + 1) % 3;
+    var next = ["NOMINAL", "CAUTION", "INTERRUPT"][t];
+    sm.raise(next);                             // 升得上去，降不下来
+    var v = 0.3 + t * 0.28;
+    var g = document.querySelector('.isx-gauge[data-state]');
+    if (g) ISX.paintGauge(g, v, next.toLowerCase());
+    var num = document.querySelector(".isx-num[data-v]");
+    if (num) ISX.roll(num, 40 + t * 22, { digits: 1, ms: 90 });
+  });
+
+  // 让状态条在载入时有一次真实变化，而不是静态装饰
+  setTimeout(function () {
+    ISX.paintGauge(document.querySelector('.isx-gauge[style*="--v:0.72"]'), 0.72, "nominal");
+  }, 220);
+})();
+</script>
+
+</body>
+</html>

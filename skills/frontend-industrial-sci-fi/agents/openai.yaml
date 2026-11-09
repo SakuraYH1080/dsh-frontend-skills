@@ -1,0 +1,4 @@
+display_name: "工业科幻视觉系统"
+short_description: "科研机构语言 × 工业秩序：切角几何、单一信号色、三态 HUD、可复算 Token 与四套预设"
+brand_color: "#C8F04B"
+default_prompt: "用 frontend-industrial-sci-fi 设计这个界面：先按三问判定 dominant（research / industry），写变体卡三行（preset / density / dominant），再从 assets/tokens.json 取对应预设落成 CSS 变量，最后按交付检查清单逐条自检。"

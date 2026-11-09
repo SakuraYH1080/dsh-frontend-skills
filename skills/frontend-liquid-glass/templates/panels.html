@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>液态玻璃 · 五种真实组合</title>
+<link rel="stylesheet" href="../assets/glass.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font: 14px/1.55 -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: #11141A;
+    background:
+      linear-gradient(200deg, #0B1220 0%, #14243F 34%, #2B4C6F 62%, #6E8FA8 100%) fixed,
+      #0B1220;
+    min-height: 100vh;
+    padding: 88px 0 220px;
+  }
+  .shell { max-width: 1080px; margin: 0 auto; padding: 0 20px; display: grid; gap: 26px; }
+  h2 { font-size: 12px; letter-spacing: .10em; text-transform: uppercase; color: rgba(255,255,255,.72); margin: 0 0 -12px; font-weight: 500; }
+  .card { padding: 18px; color: rgba(255,255,255,.92); }
+  .card h3 { margin: 0 0 4px; font-size: 15px; letter-spacing: -.01em; }
+  .card p { margin: 0; font-size: 13px; color: rgba(255,255,255,.68); }
+  .kv { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .kv:first-of-type { margin-top: 12px; }
+
+  /* 1 顶部导航：贴边，只有左右下三条边 */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; height: 60px; z-index: 30;
+    display: flex; align-items: center; gap: 24px; padding: 0 24px;
+    color: rgba(255,255,255,.94);
+  }
+  .nav b { font-size: 13px; letter-spacing: .04em; font-weight: 600; }
+  .nav a { color: rgba(255,255,255,.62); text-decoration: none; font-size: 13px; }
+  .nav a:hover { color: #fff; }
+
+  /* 2 侧栏 */
+  .cols { display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+  .side { padding: 16px 14px; min-width: 260px; }
+  .side a { display: block; padding: 7px 8px; border-radius: 8px; color: rgba(255,255,255,.66); text-decoration: none; font-size: 13px; }
+  .side a[aria-current="true"] { background: rgba(255,255,255,.16); color: #fff; }
+
+  /* 3 播放器 */
+  .player { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; }
+  .cover { width: 56px; height: 56px; border-radius: 10px; background: linear-gradient(140deg,#7DD3FC,#A78BFA 55%,#F472B6); }
+  .player .title { font-size: 14px; color: #fff; }
+  .player .meta { font-size: 12px; color: rgba(255,255,255,.6); }
+  .player .ctrl { display: flex; gap: 10px; }
+  .player .ctrl span { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.16); font-size: 13px; color: #fff; }
+
+  /* 4 模态 */
+  .modal-demo { position: relative; height: 300px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#1B3A57,#3A6C8C); }
+  .mask { position: absolute; inset: 0; background: rgba(0,0,0,.32); display: grid; place-items: center; }
+  .dialog { width: min(420px, 84%); padding: 22px; }
+  .dialog h3 { color: #fff; }
+  .dialog p { color: rgba(255,255,255,.74); }
+  .btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+  .btns button { font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 9px; border: 1px solid rgba(255,255,255,.24); background: transparent; color: #fff; cursor: pointer; }
+  .btns button.primary { background: #fff; color: #11141A; border-color: #fff; font-weight: 600; }
+
+  /* 5 底部抽屉 */
+  .sheet-demo { position: relative; height: 340px; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg,#241B3A,#4B3A6C); }
+  .sheet { position: absolute; inset: auto 0 0 0; padding: 10px 20px 22px; }
+  .handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.4); margin: 0 auto 14px; }
+  .sheet h3 { color: #fff; }
+  .sheet p, .sheet .kv { color: rgba(255,255,255,.72); }
+
+  .note { font-size: 12px; color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+
+<nav class="nav lg lg-nav" data-lg-preset="standard" data-lg-theme="dark">
+  <b>ATLAS</b>
+  <a href="#">Overview</a><a href="#">Signals</a><a href="#">Archive</a>
+</nav>
+
+<div class="shell">
+
+  <h2>1 · 顶部导航（standard / 贴边 / 三条边）</h2>
+  <div class="card lg" data-lg-preset="standard" data-lg-theme="dark">
+    <h3>导航栏是覆盖层，不是页头</h3>
+    <p>它下面永远有内容穿过，所以玻璃在这里成立。scroll 时只提高 tint α，不改 blur。</p>
+  </div>
+
+  <h2>2 · 侧栏（standard / 与主内容 1px 分界）</h2>
+  <div class="cols">
+    <aside class="side lg" data-lg-preset="standard" data-lg-theme="dark">
+      <a href="#" aria-current="true">Signal routing</a>
+      <a href="#">Carrier map</a>
+      <a href="#">Archive</a>
+      <a href="#">Settings</a>
+    </aside>
+    <div class="card lg" data-lg-preset="frost" data-lg-theme="dark">
+      <h3>主内容不用玻璃</h3>
+      <p>右边这块是 frost 预设——不是更高级，是"要读数"。数据面板永远往 frost 走。</p>
+      <div class="kv"><span>Latency p95</span><span>18.4 ms</span></div>
+      <div class="kv"><span>Throughput</span><span>2.31 GB/s</span></div>
+      <div class="kv"><span>Dropped</span><span>0</span></div>
+    </div>
+  </div>
+
+  <h2>3 · 播放器（standard · 封面主色作 tint）</h2>
+  <div class="player lg" data-lg-preset="standard" data-lg-theme="dark">
+    <div class="cover" aria-hidden="true"></div>
+    <div>
+      <div class="title">Night Ferry</div>
+      <div class="meta">Harbour Signals · 04:12</div>
+    </div>
+    <div class="ctrl"><span aria-hidden="true">◀</span><span aria-hidden="true">▶</span><span aria-hidden="true">▶▶</span></div>
+  </div>
+
+  <h2>4 · 模态（deep · 背后必须有遮罩）</h2>
+  <div class="modal-demo">
+    <div class="mask">
+      <div class="dialog lg" data-lg-preset="deep" data-lg-theme="dark">
+        <h3>覆盖当前任务？</h3>
+        <p>遮罩 α .32。弹窗 tint α ≥ .55，正文对比度按最亮背景算。</p>
+        <div class="btns"><button>取消</button><button class="primary">覆盖</button></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>5 · 底部抽屉（deep · 圆角在上 · 把手是热区）</h2>
+  <div class="sheet-demo">
+    <div class="sheet lg lg-sheet" data-lg-preset="deep" data-lg-theme="dark">
+      <div class="handle" aria-hidden="true"></div>
+      <h3>连接详情</h3>
+      <div class="kv"><span>Protocol</span><span>QUIC v1</span></div>
+      <div class="kv"><span>RTT</span><span>24 ms</span></div>
+      <div class="kv"><span>Cipher</span><span>TLS_AES_128_GCM_SHA256</span></div>
+    </div>
+  </div>
+
+  <p class="note">五块玻璃，五种工况。演示里所有产品名与数字均为虚构。</p>
+</div>
+
+<script src="../assets/glass.js"></script>
+<script>
+  LiquidGlass.init({ refract: true, guard: true });
+  // 折射只加在 deep 上：移动端的位移滤镜代价是 blur 的 3–6 倍
+  if (LiquidGlass.supportsBackdrop()) {
+    document.querySelectorAll('.lg[data-lg-preset="deep"]').forEach(function (el) {
+      el.setAttribute("data-lg-refract", "on");
+    });
+  }
+  // 滚动：只提不透明度，绝不改 blur
+  var nav = document.querySelector(".nav");
+  addEventListener("scroll", function () {
+    nav.style.setProperty("--lg-tint-alpha", scrollY > 24 ? "0.52" : "0.42");
+  }, { passive: true });
+</script>
+</body>
+</html>

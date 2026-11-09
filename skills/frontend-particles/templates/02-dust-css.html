@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dust · 纯 CSS 尘埃（零 JS）</title>
+<style>
+  :root {
+    --ink: #0b0e14;
+    --paper: #eef3fb;
+    --dot: #cfe3ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- 粒子场：60 个独立合成层，指针永不拦截 ---- */
+  .p-field {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    contain: strict;
+  }
+  .p-dot {
+    position: absolute;
+    width: var(--s, 2px);
+    height: var(--s, 2px);
+    border-radius: 50%;
+    background: var(--dot);
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: drift var(--d, 16s) linear var(--delay, 0s) infinite;
+  }
+  /* 12% 起亮、85% 起灭：两端各有 12% / 15% 的过渡窗，避免硬切 */
+  @keyframes drift {
+    0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+    12%  { opacity: var(--a, .18); }
+    85%  { opacity: var(--a, .18); }
+    100% { transform: translate3d(var(--dx, 36px), -140px, 0); opacity: 0; }
+  }
+
+  /* ---- 正文遮罩：粒子在最亮处也只到 0.18 ---- */
+  .mask {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(11,14,20,0.18), rgba(11,14,20,0.62) 78%);
+  }
+  main {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 12vh 28px 16vh;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #7f96b4;
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(34px, 5.6vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin: 0 0 24px;
+    font-weight: 600;
+  }
+  p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #b9c7dc;
+    margin: 0 0 18px;
+  }
+  .spec {
+    margin-top: 36px;
+    border-top: 1px solid rgba(207,227,255,.16);
+    padding-top: 18px;
+    font-size: 13px;
+    line-height: 1.9;
+    color: #8ea3bd;
+    font-variant-numeric: tabular-nums;
+  }
+  .spec b { color: #cfe3ff; font-weight: 600; }
+
+  /* ---- 降级：静态帧只留 40 颗，密度不塌 ---- */
+  @media (prefers-reduced-motion: reduce) {
+    .p-dot { animation: none; opacity: var(--a, .18); transform: none; }
+    .p-dot:nth-child(n+41) { display: none; }
+  }
+  @media (pointer: coarse) {
+    .p-field { opacity: .8; }
+    .p-dot { animation-duration: calc(var(--d, 16s) * 1.25); }
+  }
+  @media (max-width: 520px) {
+    main { padding: 10vh 20px 14vh; }
+    .p-dot:nth-child(n+41) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 60 个 span 全部静态写死，没有一行 JS -->
+<div class="p-field" aria-hidden="true">
+    <span class="p-dot" style="left:18.29%;top:2.71%;--s:1.43px;--d:14.54s;--dx:-53px;--delay:-23.40s;--a:0.11"></span>
+    <span class="p-dot" style="left:74.01%;top:7.39%;--s:1.67px;--d:21.90s;--dx:-41px;--delay:-19.58s;--a:0.11"></span>
+    <span class="p-dot" style="left:56.44%;top:36.42%;--s:1.47px;--d:18.46s;--dx:-47px;--delay:-0.86s;--a:0.17"></span>
+    <span class="p-dot" style="left:45.47%;top:33.52%;--s:2.45px;--d:12.41s;--dx:37px;--delay:-0.54s;--a:0.14"></span>
+    <span class="p-dot" style="left:27.24%;top:94.08%;--s:1.99px;--d:13.28s;--dx:-36px;--delay:-19.74s;--a:0.16"></span>
+    <span class="p-dot" style="left:82.34%;top:53.79%;--s:2.45px;--d:15.21s;--dx:-37px;--delay:-2.06s;--a:0.13"></span>
+    <span class="p-dot" style="left:75.28%;top:56.88%;--s:2.10px;--d:23.69s;--dx:22px;--delay:-6.23s;--a:0.16"></span>
+    <span class="p-dot" style="left:50.38%;top:56.65%;--s:1.19px;--d:17.14s;--dx:52px;--delay:-3.43s;--a:0.10"></span>
+    <span class="p-dot" style="left:52.34%;top:57.48%;--s:2.35px;--d:12.04s;--dx:21px;--delay:-16.07s;--a:0.17"></span>
+    <span class="p-dot" style="left:52.18%;top:56.83%;--s:1.09px;--d:18.00s;--dx:57px;--delay:-10.01s;--a:0.17"></span>
+    <span class="p-dot" style="left:1.99%;top:37.78%;--s:1.46px;--d:18.93s;--dx:45px;--delay:-17.74s;--a:0.11"></span>
+    <span class="p-dot" style="left:59.23%;top:91.60%;--s:2.19px;--d:20.85s;--dx:3px;--delay:-20.26s;--a:0.17"></span>
+    <span class="p-dot" style="left:61.11%;top:81.22%;--s:2.01px;--d:19.57s;--dx:51px;--delay:-16.75s;--a:0.11"></span>
+    <span class="p-dot" style="left:40.13%;top:19.75%;--s:1.21px;--d:12.24s;--dx:3px;--delay:-21.09s;--a:0.14"></span>
+    <span class="p-dot" style="left:84.91%;top:74.79%;--s:1.10px;--d:17.05s;--dx:-22px;--delay:-11.80s;--a:0.17"></span>
+    <span class="p-dot" style="left:34.08%;top:66.55%;--s:1.33px;--d:16.21s;--dx:22px;--delay:-20.05s;--a:0.15"></span>
+    <span class="p-dot" style="left:42.24%;top:95.73%;--s:1.78px;--d:14.91s;--dx:5px;--delay:-7.65s;--a:0.16"></span>
+    <span class="p-dot" style="left:23.78%;top:45.59%;--s:1.71px;--d:17.59s;--dx:-4px;--delay:-21.28s;--a:0.17"></span>
+    <span class="p-dot" style="left:98.73%;top:92.57%;--s:1.25px;--d:15.99s;--dx:-55px;--delay:-16.34s;--a:0.16"></span>
+    <span class="p-dot" style="left:71.00%;top:50.11%;--s:1.04px;--d:22.76s;--dx:48px;--delay:-22.57s;--a:0.18"></span>
+    <span class="p-dot" style="left:86.56%;top:52.46%;--s:1.22px;--d:21.79s;--dx:53px;--delay:-13.98s;--a:0.12"></span>
+    <span class="p-dot" style="left:85.20%;top:49.78%;--s:1.99px;--d:17.14s;--dx:14px;--delay:-21.36s;--a:0.15"></span>
+    <span class="p-dot" style="left:4.35%;top:10.17%;--s:2.26px;--d:23.47s;--dx:33px;--delay:-4.97s;--a:0.11"></span>
+    <span class="p-dot" style="left:62.81%;top:8.44%;--s:1.31px;--d:17.14s;--dx:15px;--delay:-4.83s;--a:0.11"></span>
+    <span class="p-dot" style="left:93.35%;top:41.10%;--s:1.28px;--d:21.48s;--dx:33px;--delay:-14.90s;--a:0.15"></span>
+    <span class="p-dot" style="left:22.82%;top:87.78%;--s:1.16px;--d:17.35s;--dx:38px;--delay:-1.74s;--a:0.16"></span>
+    <span class="p-dot" style="left:76.59%;top:57.51%;--s:2.59px;--d:23.67s;--dx:-22px;--delay:-21.64s;--a:0.16"></span>
+    <span class="p-dot" style="left:15.48%;top:14.84%;--s:1.12px;--d:16.89s;--dx:-39px;--delay:-19.36s;--a:0.11"></span>
+    <span class="p-dot" style="left:91.19%;top:54.50%;--s:2.28px;--d:18.59s;--dx:53px;--delay:-20.22s;--a:0.13"></span>
+    <span class="p-dot" style="left:17.80%;top:76.85%;--s:1.62px;--d:18.70s;--dx:59px;--delay:-6.00s;--a:0.12"></span>
+    <span class="p-dot" style="left:34.37%;top:1.48%;--s:2.20px;--d:14.88s;--dx:18px;--delay:-8.22s;--a:0.10"></span>
+    <span class="p-dot" style="left:56.37%;top:63.01%;--s:2.34px;--d:16.83s;--dx:52px;--delay:-14.96s;--a:0.12"></span>
+    <span class="p-dot" style="left:36.78%;top:3.69%;--s:1.80px;--d:23.72s;--dx:10px;--delay:-13.90s;--a:0.14"></span>
+    <span class="p-dot" style="left:40.43%;top:39.36%;--s:1.25px;--d:12.00s;--dx:21px;--delay:-11.01s;--a:0.13"></span>
+    <span class="p-dot" style="left:57.02%;top:19.35%;--s:1.62px;--d:22.08s;--dx:17px;--delay:-3.01s;--a:0.14"></span>
+    <span class="p-dot" style="left:11.46%;top:72.78%;--s:2.11px;--d:19.73s;--dx:-32px;--delay:-6.13s;--a:0.16"></span>
+    <span class="p-dot" style="left:63.96%;top:72.20%;--s:2.49px;--d:20.84s;--dx:33px;--delay:-23.07s;--a:0.12"></span>
+    <span class="p-dot" style="left:96.07%;top:81.16%;--s:1.22px;--d:15.15s;--dx:45px;--delay:-23.56s;--a:0.17"></span>
+    <span class="p-dot" style="left:24.88%;top:46.25%;--s:2.08px;--d:18.85s;--dx:53px;--delay:-3.51s;--a:0.11"></span>
+    <span class="p-dot" style="left:26.22%;top:43.69%;--s:1.58px;--d:14.66s;--dx:-28px;--delay:-21.62s;--a:0.14"></span>
+    <span class="p-dot" style="left:78.22%;top:42.76%;--s:1.59px;--d:21.73s;--dx:-54px;--delay:-6.67s;--a:0.13"></span>
+    <span class="p-dot" style="left:85.40%;top:41.92%;--s:2.07px;--d:17.36s;--dx:43px;--delay:-6.18s;--a:0.14"></span>
+    <span class="p-dot" style="left:63.98%;top:9.83%;--s:1.13px;--d:18.97s;--dx:-5px;--delay:-18.54s;--a:0.15"></span>
+    <span class="p-dot" style="left:8.00%;top:50.04%;--s:1.09px;--d:15.65s;--dx:-49px;--delay:-5.82s;--a:0.11"></span>
+    <span class="p-dot" style="left:49.80%;top:48.81%;--s:1.38px;--d:13.85s;--dx:-33px;--delay:-23.68s;--a:0.12"></span>
+    <span class="p-dot" style="left:80.87%;top:94.65%;--s:1.66px;--d:22.55s;--dx:46px;--delay:-19.62s;--a:0.11"></span>
+    <span class="p-dot" style="left:73.84%;top:23.92%;--s:1.48px;--d:20.18s;--dx:30px;--delay:-5.08s;--a:0.10"></span>
+    <span class="p-dot" style="left:8.85%;top:97.67%;--s:1.59px;--d:20.38s;--dx:-52px;--delay:-9.08s;--a:0.10"></span>
+    <span class="p-dot" style="left:43.32%;top:64.97%;--s:1.64px;--d:15.34s;--dx:-7px;--delay:-22.73s;--a:0.15"></span>
+    <span class="p-dot" style="left:98.52%;top:75.24%;--s:1.98px;--d:14.65s;--dx:42px;--delay:-11.62s;--a:0.13"></span>
+    <span class="p-dot" style="left:90.77%;top:63.54%;--s:1.49px;--d:13.79s;--dx:40px;--delay:-4.39s;--a:0.16"></span>
+    <span class="p-dot" style="left:48.15%;top:39.68%;--s:1.83px;--d:21.01s;--dx:-17px;--delay:-19.35s;--a:0.16"></span>
+    <span class="p-dot" style="left:35.12%;top:43.19%;--s:1.96px;--d:12.43s;--dx:29px;--delay:-18.23s;--a:0.16"></span>
+    <span class="p-dot" style="left:49.10%;top:12.86%;--s:1.95px;--d:15.61s;--dx:-10px;--delay:-14.16s;--a:0.10"></span>
+    <span class="p-dot" style="left:7.66%;top:37.93%;--s:2.38px;--d:15.40s;--dx:-12px;--delay:-22.62s;--a:0.16"></span>
+    <span class="p-dot" style="left:91.04%;top:64.85%;--s:2.14px;--d:18.88s;--dx:-5px;--delay:-11.06s;--a:0.17"></span>
+    <span class="p-dot" style="left:29.37%;top:90.48%;--s:1.18px;--d:12.18s;--dx:-24px;--delay:-11.43s;--a:0.10"></span>
+    <span class="p-dot" style="left:34.11%;top:63.66%;--s:1.99px;--d:20.30s;--dx:15px;--delay:-5.33s;--a:0.16"></span>
+    <span class="p-dot" style="left:61.67%;top:20.81%;--s:1.85px;--d:21.94s;--dx:21px;--delay:-8.65s;--a:0.15"></span>
+    <span class="p-dot" style="left:59.46%;top:90.14%;--s:2.60px;--d:23.35s;--dx:-56px;--delay:-15.52s;--a:0.15"></span>
+</div>
+<div class="mask" aria-hidden="true"></div>
+
+<main>
+  <p class="eyebrow">frontend-particles · 02</p>
+  <h1>尘埃：零 JS，60 粒</h1>
+  <p>
+    每个粒子是一个独立合成层，成本来自层数而不是像素。超过 80 层，Safari 与 Chrome 的
+    raster 时间开始抖；60 是安全值。
+  </p>
+  <p>
+    每粒的尺寸、时长、水平位移、延迟都不同。延迟取负值，动画一开始就分布在中段，
+    避免首屏齐发。
+  </p>
+  <div class="spec">
+    粒子数 <b>60</b> · 时长 <b>12–24s</b> · 尺寸 <b>1–2.6px</b> ·
+    峰值 alpha <b>0.10–0.18</b> · 正文叠合对比度 <b>≥ 4.5:1</b>
+  </div>
+</main>
+
+</body>
+</html>

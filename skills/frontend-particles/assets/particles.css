@@ -1,0 +1,210 @@
+/* frontend-particles · particles.css
+ * 层级、遮罩、纯 CSS 粒子路线、reduced-motion。
+ * 所有数值与 assets/tokens.json 一致：改这里必须同步改 tokens.json 与 SKILL.md 第三节。
+ */
+
+:root {
+  --p-ink: #0b0e14;
+  --p-dot: #cfe3ff;
+  --p-dot-warm: #ffe3c2;
+  --p-line: #8fb4d9;
+  --p-mask: rgba(11, 14, 20, 0.55);
+
+  --p-count: 60;            /* 纯 CSS 路线专用，上限 80 */
+  --p-size: 2px;
+  --p-alpha: 0.5;           /* 单粒峰值，正文区必须 ≤ 0.18 */
+  --p-duration: 14s;
+  --p-trail: 0.18;          /* 仅 Canvas 路线读取，CSS 不用 */
+
+  --p-z-bg: -1;
+  --p-z-mask: 0;
+}
+
+/* ---- 1. 层级骨架 ---------------------------------------------------- */
+
+.p-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;      /* 硬要求：永不拦截点击 */
+  z-index: var(--p-z-bg);
+  overflow: hidden;
+  contain: strict;
+}
+
+.p-layer--local {
+  position: absolute;        /* 只铺满某个容器时用这个变体 */
+}
+
+.p-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---- 2. 正文遮罩：粒子不能压在正文上 --------------------------------- */
+
+.p-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--p-z-mask);
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(11, 14, 20, 0.15), rgba(11, 14, 20, 0.62) 70%),
+    linear-gradient(180deg, rgba(11, 14, 20, 0.35), rgba(11, 14, 20, 0.55));
+}
+
+/* 只在正文区域内压暗：容器覆盖内容列，不改粒子本身 */
+.p-mask--content {
+  position: absolute;
+  inset: 0 0 0 0;
+  background: linear-gradient(90deg,
+    rgba(11, 14, 20, 0.55) 0%,
+    rgba(11, 14, 20, 0.42) 55%,
+    rgba(11, 14, 20, 0) 100%);
+}
+
+/* ---- 3. 纯 CSS 粒子路线（≤80 粒，零 JS） ----------------------------- */
+
+.p-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--p-z-bg);
+  overflow: hidden;
+  contain: strict;
+}
+
+.p-dot {
+  position: absolute;
+  width: var(--s, var(--p-size));
+  height: var(--s, var(--p-size));
+  border-radius: 50%;
+  background: var(--c, var(--p-dot));
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: p-drift var(--d, var(--p-duration)) linear var(--delay, 0s) infinite;
+}
+
+@keyframes p-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--a, var(--p-alpha));
+  }
+  85% {
+    opacity: var(--a, var(--p-alpha));
+  }
+  100% {
+    transform: translate3d(var(--dx, 40px), -120px, 0);
+    opacity: 0;
+  }
+}
+
+/* 短暂闪一下的星点：长周期 + 短亮窗，用于星场补充 */
+.p-dot--twinkle {
+  animation:
+    p-drift var(--d, 18s) linear var(--delay, 0s) infinite,
+    p-twinkle 3.6s ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes p-twinkle {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.45); }
+}
+
+/* ---- 4. 数据流：沿直线落下的短柱 ------------------------------------- */
+
+.p-stream {
+  position: absolute;
+  top: -12%;
+  width: 1px;
+  height: var(--h, 42px);
+  background: linear-gradient(180deg,
+    rgba(207, 227, 255, 0) 0%,
+    rgba(207, 227, 255, 0.55) 60%,
+    rgba(207, 227, 255, 0) 100%);
+  opacity: 0;
+  animation: p-fall var(--d, 2.8s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes p-fall {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.6; }
+  100% { transform: translate3d(0, 118vh, 0); opacity: 0; }
+}
+
+/* ---- 5. 加载环：环形分布的粒子 --------------------------------------- */
+
+.p-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+  transform: rotate(var(--rot, 0deg));
+  transform-origin: 0 0;
+}
+
+.p-ring > i {
+  position: absolute;
+  left: var(--r, 48px);
+  top: 0;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--p-dot);
+  opacity: 0.6;
+  animation: p-orbit var(--d, 6s) linear infinite;
+}
+
+@keyframes p-orbit {
+  from { transform: rotate(0deg) translateX(0); }
+  to   { transform: rotate(360deg) translateX(0); }
+}
+
+/* ---- 6. 降级 -------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .p-dot,
+  .p-dot--twinkle,
+  .p-stream,
+  .p-ring > i {
+    animation: none !important;
+    opacity: var(--a, var(--p-alpha));
+    transform: none;
+  }
+  .p-stream { opacity: 0.35; }
+  .p-canvas { visibility: visible; }  /* 静态帧由 JS 画一次，不启动 rAF */
+}
+
+@media (pointer: coarse) {
+  .p-field { opacity: 0.8; }
+  .p-dot { animation-duration: calc(var(--d, var(--p-duration)) * 1.25); }
+}
+
+@media (max-width: 500px) {
+  .p-mask {
+    background: linear-gradient(180deg, rgba(11, 14, 20, 0.45), rgba(11, 14, 20, 0.62));
+  }
+}
+
+/* 省电/低端：JS 会给根元素加这个类 */
+.p-lite .p-dot--twinkle { animation-name: p-drift; }
+.p-lite .p-stream { display: none; }
+
+/* ---- 7. 使用示例（注释，不要直接生效） --------------------------------
+ *
+ * <div class="p-layer"><canvas class="p-canvas" id="pf"></canvas></div>
+ * <div class="p-mask"></div>
+ * <main>正文…</main>
+ *
+ * 纯 CSS：
+ * <div class="p-field" aria-hidden="true">
+ *   <span class="p-dot" style="left:12%;top:38%;--s:2px;--d:16s;--dx:38px;--delay:-6s;--a:.5"></span>
+ *   …
+ * </div>
+ */

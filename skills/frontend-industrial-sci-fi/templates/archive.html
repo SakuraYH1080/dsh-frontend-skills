@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-isx-preset="cold-store">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COLD STORE · 存档区 / Archive</title>
+<link rel="stylesheet" href="../assets/industrial.css">
+</head>
+<body class="isx-shell">
+
+<!-- 反相预设：同一套 token，只是语义槽位换值 -->
+<header class="isx-top">
+  <span class="isx-brand">COLD STORE</span>
+  <span class="isx-micro">ARCHIVE UNIT / 恒温层</span>
+  <nav class="isx-tabs" role="tablist" aria-label="存档视图">
+    <button class="isx-tab" role="tab" aria-selected="true">索引 / INDEX</button>
+  </nav>
+  <span class="isx-micro"><span data-isx-stamp="datetime">----</span></span>
+</header>
+
+<main class="isx-main">
+
+  <!-- 标题区：本页只有一个 h1，其余都是分区 h2 -->
+  <div style="display:flex;align-items:flex-end;gap:16px;border-bottom:1px solid var(--isx-line);padding-bottom:12px">
+    <h1 style="margin:0;font:700 40px/1.1 var(--isx-f-body);letter-spacing:-0.01em">存档索引</h1>
+    <span class="isx-label" style="padding-bottom:6px">ARCHIVE INDEX</span>
+    <span class="isx-micro" style="margin-left:auto;padding-bottom:8px">
+      共 <b class="isx-num">0147</b> 卷 · 冷区 <b class="isx-num">0128</b> 卷 · 可用 <b class="isx-num">0096.4</b> TB
+    </span>
+  </div>
+
+  <!-- 三段分区：每段一条 1px 线，不靠卡片堆叠 -->
+  <section aria-labelledby="g-1">
+    <div class="isx-zone-head">
+      <span class="isx-zone-id">ARC · 001</span>
+      <h2 class="isx-zone-title" id="g-1">高密卷 <span>HIGH DENSITY</span></h2>
+      <span class="isx-zone-count">04 卷</span>
+    </div>
+
+    <table class="isx-table">
+      <thead>
+        <tr>
+          <th>卷号</th>
+          <th>封存日期</th>
+          <th>介质</th>
+          <th class="num">容量</th>
+          <th class="num">校验</th>
+          <th class="mid">状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="isx-num">VOL-0147-A</td>
+          <td class="isx-num">2087-02-11</td>
+          <td>陶瓷基 CERAMIC</td>
+          <td class="num">12.4 TB</td>
+          <td class="num">OK</td>
+          <td class="mid"><span class="isx-dot" data-state="nominal"></span> 稳定</td>
+        </tr>
+        <tr>
+          <td class="isx-num">VOL-0147-B</td>
+          <td class="isx-num">2087-02-11</td>
+          <td>陶瓷基 CERAMIC</td>
+          <td class="num">12.4 TB</td>
+          <td class="num">OK</td>
+          <td class="mid"><span class="isx-dot" data-state="nominal"></span> 稳定</td>
+        </tr>
+        <tr>
+          <td class="isx-num">VOL-0148-A</td>
+          <td class="isx-num">2087-03-02</td>
+          <td>光学 OPTICAL</td>
+          <td class="num">8.0 TB</td>
+          <td class="num">DIFF</td>
+          <td class="mid"><span class="isx-dot" data-state="caution"></span> 待复核</td>
+        </tr>
+        <tr>
+          <td class="isx-num">VOL-0149-A</td>
+          <td class="isx-num">2087-04-19</td>
+          <td>光学 OPTICAL</td>
+          <td class="num">8.0 TB</td>
+          <td class="num">BAD</td>
+          <td class="mid"><span class="isx-dot" data-state="interrupt"></span> 失效</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-labelledby="g-2">
+    <div class="isx-zone-head">
+      <span class="isx-zone-id">ARC · 002</span>
+      <h2 class="isx-zone-title" id="g-2">检索条件 <span>QUERY</span></h2>
+      <span class="isx-zone-count">03 ACTIVE</span>
+    </div>
+
+    <div class="isx-card">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+        <div>
+          <span class="isx-label">起始日期 FROM</span>
+          <div class="isx-readout-value" style="margin-top:4px">
+            <span class="isx-num" style="font-size:20px">2087-01-01</span>
+          </div>
+        </div>
+        <div>
+          <span class="isx-label">截止日期 TO</span>
+          <div class="isx-readout-value" style="margin-top:4px">
+            <span class="isx-num" style="font-size:20px">2087-12-31</span>
+          </div>
+        </div>
+        <div>
+          <span class="isx-label">命中 HITS</span>
+          <div class="isx-readout-value" style="margin-top:4px">
+            <span class="isx-num" style="font-size:20px" data-v="128">128</span>
+            <span class="isx-unit">卷</span>
+          </div>
+        </div>
+        <div>
+          <span class="isx-label">耗时 ELAPSED</span>
+          <div class="isx-readout-value" style="margin-top:4px">
+            <span class="isx-num" style="font-size:20px" data-v="0.84">0.84</span>
+            <span class="isx-unit">s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 状态通道演示：三条状态条，长度来自真实数值 -->
+  <section aria-labelledby="g-3">
+    <div class="isx-zone-head">
+      <span class="isx-zone-id">ARC · 003</span>
+      <h2 class="isx-zone-title" id="g-3">库容占用 <span>CAPACITY</span></h2>
+      <span class="isx-zone-count">03 / 03</span>
+    </div>
+
+    <div class="isx-grid">
+      <div class="isx-gauge" style="--v:0.68" data-state="nominal">
+        <span class="isx-label">冷区 A 架 COLD-A</span>
+        <div class="isx-readout-value">
+          <span class="isx-num">68.0</span><span class="isx-unit">%</span>
+        </div>
+        <div class="isx-gauge-track"><div class="isx-gauge-fill"></div></div>
+        <span class="isx-readout-meta">上限 80% · 余 12.0</span>
+      </div>
+
+      <div class="isx-gauge" style="--v:0.83" data-state="caution">
+        <span class="isx-label">冷区 B 架 COLD-B</span>
+        <div class="isx-readout-value">
+          <span class="isx-num">83.0</span><span class="isx-unit">%</span>
+        </div>
+        <div class="isx-gauge-track"><div class="isx-gauge-fill"></div></div>
+        <span class="isx-readout-meta">上限 80% · 超 3.0</span>
+      </div>
+
+      <div class="isx-gauge" style="--v:0.97" data-state="interrupt">
+        <span class="isx-label">冷区 C 架 COLD-C</span>
+        <div class="isx-readout-value">
+          <span class="isx-num">97.0</span><span class="isx-unit">%</span>
+        </div>
+        <div class="isx-gauge-track"><div class="isx-gauge-fill"></div></div>
+        <span class="isx-readout-meta">已锁定 · 拒绝写入</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="isx-alert" data-state="interrupt" role="alert">
+    <span class="isx-dot" data-state="interrupt" aria-hidden="true"></span>
+    <strong style="font-size:13px">VOL-0149-A 校验失败，已隔离</strong>
+    <span class="isx-micro" style="margin-left:auto">CODE 0x11 · 需人工复核</span>
+    <button class="isx-btn" style="min-height:24px;padding:0 8px">移交 HANDOVER</button>
+  </div>
+
+</main>
+
+<footer class="isx-foot">
+  <span class="isx-micro">COLD-STORE PRESET · 行高 36px · 切角 8px · 内边距 20px</span>
+  <span class="isx-micro" style="margin-left:auto">
+    亮度上限 0.9 · <span data-isx-stamp="time">--:--:--</span>
+  </span>
+</footer>
+
+<script src="../assets/industrial.js"></script>
+<script>
+(function () {
+  // 冷库场景：状态条在载入后 160ms 内从 0 长到目标值，体现「读数抵达」而不是装饰动画
+  var bars = document.querySelectorAll(".isx-gauge");
+  Array.prototype.forEach.call(bars, function (g) {
+    var target = parseFloat(getComputedStyle(g).getPropertyValue("--v")) || 0;
+    var fill = g.querySelector(".isx-gauge-fill");
+    var state = g.getAttribute("data-state");
+    ISX.paintGauge(g, 0, state);
+    setTimeout(function () { ISX.paintGauge(g, target, state); }, 160);
+  });
+
+  // 顺带演示 roll：把命中数从 0 滚到 128
+  var hit = document.querySelector('.isx-num[data-v="128"]');
+  if (hit) { hit.textContent = "0"; ISX.roll(hit, 128, { digits: 0, ms: 160 }); }
+})();
+</script>
+
+</body>
+</html>

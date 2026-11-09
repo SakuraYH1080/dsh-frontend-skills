@@ -1,0 +1,336 @@
+/* frontend-anime-fusion · anime.css
+ * 四层结构 + 立绘 + 面板 + scrim 的可直接引用套件。
+ * 数值唯一权威是 tokens.json；此处默认值与它一致。
+ * 零依赖：无 @import、无外链字体、无第三方图片。
+ */
+
+:root {
+  /* 九个旋钮 */
+  --af-char-h: 62;            /* % of viewport height, unitless for calc() */
+  --af-headroom: 10;          /* % of character height */
+  --af-anchor-x: 61.8;        /* % of viewport width */
+  --af-scrim: 0.72;           /* 0-1, 由对比度反解 */
+  --af-panel-gap: 24px;
+  --af-edge-glow: 60;         /* 0-100 */
+  --af-parallax: 0.45;        /* 恒 < 1.0 */
+  --af-breath-amp: 2px;
+  --af-breath-dur: 4s;
+  --af-cut: 46%;              /* 仅 B 模型使用 */
+
+  /* 动效 */
+  --af-ease: cubic-bezier(.22, .61, .36, 1);
+  --af-enter-char: 620ms;
+  --af-enter-panel: 460ms;
+  --af-enter-delay: 140ms;    /* 120-200ms，角色先、面板后 */
+
+  /* 色板 */
+  --af-paper: #FFF7FA;
+  --af-ink: #10121A;
+  --af-accent: #FF5C8A;
+  --af-accent-2: #7BD7F5;
+  --af-gold: #F5C86B;
+  --af-rim: #FFD9E4;
+  --af-shadow: rgba(16, 18, 26, .35);
+  --af-env-tint: #7BD7F5;
+
+  --af-font: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC",
+             "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --af-font-display: "Iowan Old Style", "Songti SC", Georgia, serif;
+}
+
+/* ---------- 舞台：四层的公共坐标系 ---------- */
+.af-stage {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;  /* 必须：否则 mix-blend-mode 会穿透到页面根 */
+  background: var(--af-paper);
+  color: var(--af-ink);
+  font-family: var(--af-font);
+}
+
+/* L0 背景环境：只负责色块、渐变、地面线 */
+.af-l0 {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(80% 55% at 62% 18%, rgba(255, 92, 138, .22), transparent 62%),
+    radial-gradient(70% 60% at 18% 82%, rgba(123, 215, 245, .28), transparent 66%),
+    linear-gradient(180deg, #FDF3F7 0%, #F4EEF6 52%, #E8E6F2 100%);
+}
+
+/* 地面线：让角色有落脚点，不是悬空贴图 */
+.af-l0::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 18, 26, .18), transparent);
+}
+
+/* L1 角色 */
+.af-char {
+  position: absolute;
+  z-index: 10;
+  bottom: 0;
+  height: calc(var(--af-char-h) * 1vh);
+  aspect-ratio: 2 / 3;
+  left: calc(var(--af-anchor-x) * 1%);
+  transform: translateX(-50%);
+  will-change: transform;
+}
+
+.af-char__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 0%;   /* 垂直永远顶对齐，保住头顶 */
+  /* 底边 12% 渐隐：抠图硬边是「被剪下来」的铁证 */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  /* 1px 内发光：跟随 alpha 通道，不产生矩形 */
+  filter: drop-shadow(0 0 calc(var(--af-edge-glow) * 0.02px) var(--af-rim));
+  animation: af-breath var(--af-breath-dur) ease-in-out infinite;
+}
+
+/* 环境色渗透：只叠一层，不混角色本体 */
+.af-char::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--af-env-tint);
+  mix-blend-mode: soft-light;
+  opacity: .08;
+  pointer-events: none;
+}
+
+/* L2 界面面板 */
+.af-panel {
+  position: absolute;
+  z-index: 20;
+  box-sizing: border-box;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--af-paper);
+  /* 有厚度：受光侧亮边 + 背光侧暗边，不描四边 */
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, .9),
+    inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 1px 0 rgba(16, 18, 26, .06),
+    0 12px 32px -8px var(--af-shadow);
+}
+
+.af-panel--left  { left: var(--af-panel-gap); top: 50%; transform: translateY(-50%); width: min(38vw, 420px); }
+.af-panel--right { right: var(--af-panel-gap); top: 50%; transform: translateY(-50%); width: min(34vw, 380px); }
+.af-panel--bottom { left: 50%; transform: translateX(-50%); bottom: 0; width: min(760px, calc(100% - 2 * var(--af-panel-gap))); }
+
+/* 文字承载层：scrim 由对比度算例反解，不是手调 */
+.af-scrim {
+  background: rgba(16, 18, 26, var(--af-scrim));
+  color: #FFFFFF;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.af-scrim--light {
+  background: rgba(255, 247, 250, .9);
+  color: var(--af-ink);
+}
+
+/* L3 前景氛围：只放光斑，不盖字、不拦指针 */
+.af-l3 {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.af-l3 span {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .85), rgba(255, 217, 228, 0) 70%);
+  opacity: .35;   /* 上限 0.35 */
+}
+
+.af-l3 span:nth-child(1) { width: 9px;  height: 9px;  left: 12%; top: 18%; }
+.af-l3 span:nth-child(2) { width: 6px;  height: 6px;  left: 28%; top: 42%; }
+.af-l3 span:nth-child(3) { width: 14px; height: 14px; left: 76%; top: 26%; }
+.af-l3 span:nth-child(4) { width: 5px;  height: 5px;  left: 88%; top: 58%; }
+
+/* ---------- B 模型：同一切线切两片 ---------- */
+.af-char--split .af-char__back,
+.af-char--split .af-char__front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 0%;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.af-char--split .af-char__back {
+  z-index: 0;
+  clip-path: inset(0 0 calc(100% - var(--af-cut)) 0);
+}
+
+.af-char--split .af-char__front {
+  z-index: 24;   /* 高于面板的 20，低于前景的 30 */
+  clip-path: inset(var(--af-cut) 0 0 0);
+}
+
+/* ---------- 入场编排 ---------- */
+@keyframes af-rise {
+  from { opacity: 0; transform: translateY(var(--af-enter-shift, 18px)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.af-anim .af-char {
+  animation: af-rise var(--af-enter-char) var(--af-ease) both;
+}
+
+.af-anim .af-panel {
+  --af-enter-shift: 24px;
+  animation: af-rise var(--af-enter-panel) var(--af-ease) var(--af-enter-delay) both;
+}
+
+.af-anim .af-l3 {
+  animation: af-fade 700ms linear 320ms both;
+}
+
+@keyframes af-fade { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes af-breath {
+  0%, 100% { transform: translateY(calc(var(--af-breath-amp) * -1)); }
+  50%      { transform: translateY(var(--af-breath-amp)); }
+}
+
+/* 只允许 transform / opacity 参与动画 */
+@media (prefers-reduced-motion: reduce) {
+  .af-anim .af-char,
+  .af-anim .af-panel,
+  .af-anim .af-l3,
+  .af-char__img {
+    animation: none;
+  }
+  .af-char__img { transform: none; }
+}
+
+/* ---------- 预设 ---------- */
+.af-preset-stage    { --af-char-h: 68; --af-headroom: 10; --af-anchor-x: 61.8; --af-scrim: .72; --af-parallax: .45; }
+.af-preset-launcher { --af-char-h: 74; --af-headroom: 8;  --af-anchor-x: 66.7; --af-scrim: .78; --af-parallax: .85; --af-cut: 46%; }
+.af-preset-profile  { --af-char-h: 48; --af-headroom: 12; --af-anchor-x: 50;   --af-scrim: 0;   --af-parallax: 0; }
+.af-preset-campaign { --af-char-h: 62; --af-headroom: 12; --af-anchor-x: 61.8; --af-scrim: .82; --af-parallax: .75; --af-cut: 52%; }
+
+/* ---------- 排版 ---------- */
+.af-title {
+  font-family: var(--af-font-display);
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.15;
+  margin: 0 0 12px;
+  letter-spacing: .01em;
+}
+
+.af-sub {
+  font-size: 13px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--af-accent);
+  margin: 0 0 10px;
+}
+
+.af-body {
+  font-size: 15px;
+  line-height: 1.65;
+  max-width: 34ch;   /* 34 汉字 / 约 62 字符 */
+  margin: 0 0 18px;
+  opacity: .82;
+}
+
+.af-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.af-btn {
+  appearance: none;
+  border: 0;
+  min-height: 44px;         /* 触摸目标下限 */
+  padding: 0 22px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--af-ink);
+  color: var(--af-paper);
+  transition: transform 160ms var(--af-ease);
+}
+
+.af-btn:hover { transform: translateY(-1px); }
+
+.af-btn--ghost {
+  background: transparent;
+  color: var(--af-ink);
+  box-shadow: inset 0 0 0 1px rgba(16, 18, 26, .28);
+}
+
+.af-btn--accent { background: var(--af-accent); color: #fff; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .af-panel--left, .af-panel--right {
+    width: min(46vw, 340px);
+  }
+}
+
+/* 竖屏重排：角色上 / 内容下，重叠 24px 制造一处交叉遮挡 */
+@media (max-width: 640px) {
+  .af-stage {
+    --af-char-h: 52;
+    --af-headroom: 12;
+    --af-anchor-x: 50;
+    --af-parallax: 0;   /* 移动端关视差，省电 */
+    --af-breath-amp: 1.5px;
+  }
+
+  .af-char {
+    top: 0;
+    bottom: auto;
+    height: calc(var(--af-char-h) * 1vh);
+  }
+
+  .af-panel--left,
+  .af-panel--right,
+  .af-panel--bottom {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    transform: none;
+    width: calc(100% - 32px);
+    margin: calc(var(--af-char-h) * 1vh - 24px) auto 0;
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .af-panel { min-height: 46svh; }
+}
+
+/* 横屏：高度不足，角色让位给面板 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .af-stage { --af-char-h: 46; --af-headroom: 6; }
+  .af-l3 { display: none; }
+  .af-panel { padding: 16px; }
+  .af-body { max-width: 40ch; }
+}
+
+/* 竖屏特化：360px 宽时顶对齐偏移 4% 保住头顶 */
+@media (max-width: 380px) {
+  .af-char__img { object-position: 50% 4%; }
+  .af-title { font-size: 26px; }
+}
+

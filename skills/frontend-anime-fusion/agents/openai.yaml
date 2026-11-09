@@ -1,0 +1,4 @@
+display_name: 二次元角色与界面融合
+short_description: 只决定角色立绘与界面的空间关系：三种关系模型、四层结构与遮罩、面板禁区、入场与呼吸、scrim 算例与裁切安全区。
+brand_color: "#FF5C8A"
+default_prompt: 用 frontend-anime-fusion 处理这个二次元界面：先定关系模型 A/B/C，再按预设定量，清掉面板与头部禁区的重叠，最后过 scrim 算例与 360/768/1280/1920 四档裁切。
