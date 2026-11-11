@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>十七间 · 山里的一栋客房</title>
+<style>
+/* ===========================================================
+   02-place · 地点 / 民宿 / 空间
+   六节 + closing。一个 dealt moment（image-scale + 时刻表）。
+   与 01-editorial 的差别：竖构图 hero、图块为主、文案退到图注位置。
+   无外链，图全部内联 SVG 占位 —— 换真图时保持 aspect-ratio。
+   =========================================================== */
+
+:root {
+  --u: 8px;
+  --wrap: 1240px;
+  --gut: 72px;
+  --padt: 104px;
+  --padb: 64px;
+
+  --n-0: #ffffff;
+  --n-50: #f8f7f4;
+  --n-100: #f0eee8;
+  --n-200: #e2dfd6;
+  --n-300: #cbc6b8;
+  --n-500: #8c8778;
+  --n-700: #4c483e;
+  --n-900: #232019;
+  --n-1000: #12100b;
+
+  --ink: var(--n-900);
+  --ink-soft: var(--n-700);
+  --ink-mute: var(--n-500);
+  --rule: var(--n-200);
+  --accent: #7a5c2e;
+
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-serif: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC",
+    "SimSun", Georgia, serif;
+
+  --fs-body: 17px;
+  --fs-body-sm: 15px;
+  --fs-label: 13px;
+  --fs-h2: 30px;
+  --lh-body: 1.8;
+  --lh-body-sm: 1.75;
+  --lh-h2: 1.32;
+  --measure: 30em;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-micro: 120ms;
+  --t-large: 650ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--n-50);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 500; text-wrap: balance; }
+p { margin: 0 0 14px; max-width: var(--measure); text-wrap: pretty; line-break: strict; }
+p:last-child { margin-bottom: 0; }
+
+main > section, footer.closing {
+  height: calc(var(--h, 1) * 100svh);
+  display: grid;
+  align-content: start;
+  padding-top: var(--padt);
+  padding-bottom: var(--padb);
+  position: relative;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.label {
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* ---- hero：竖构图，标题压在左侧三成，右侧留空给后面的图 ---- */
+
+.hero {
+  background: var(--n-50);
+}
+
+.hero .wrap {
+  display: grid;
+  grid-template-columns: 5fr 4fr;
+  gap: 48px;
+  align-items: end;
+  height: 100%;
+}
+
+.hero__left { padding-bottom: 8px; }
+
+h1 {
+  font-size: clamp(56px, 9vw, 120px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+
+.hero__kicker {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.hero__desc {
+  margin-top: 32px;
+  font-size: 19px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  max-width: 22em;
+}
+
+.hero__facts {
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 0 32px;
+  padding-top: 16px;
+  font-size: var(--fs-body-sm);
+  justify-content: start;
+}
+.hero__facts div { display: grid; gap: 2px; }
+.hero__facts dt { color: var(--ink-mute); font-size: var(--fs-label); }
+.hero__facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+.hero__fig svg { display: block; width: 100%; height: auto; }
+
+/* ---- 通用节头 ---- */
+
+.sec-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 24px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: -0.01em; }
+
+/* ---- 空间节：一大两小的图块 ---- */
+
+.space-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+.space .sec-head { margin-bottom: 4px; }
+
+/* 右列两张小图压成 520x250 的裁切框，整块空间节才塞得进一屏 */
+.space-grid .fig:not(.fig--wide) svg {
+  aspect-ratio: 520 / 250;
+  height: auto;
+}
+.fig { margin: 0; }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig figcaption {
+  margin-top: 10px;
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+  line-height: 1.6;
+}
+.fig--wide { grid-row: span 2; }
+
+.space-note {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+}
+
+/* ---- dealt moment：右侧图放大 + 左侧三段时间 ---- */
+
+.moment {
+  background: var(--n-1000);
+  color: var(--n-100);
+  --h: 2;
+}
+.moment .wrap {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 4fr 7fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.clock { display: grid; gap: 28px; }
+
+.clock__row {
+  display: grid;
+  grid-template-columns: 4.5em 1fr;
+  gap: 16px;
+  align-items: baseline;
+  border-top: 1px solid rgba(240, 238, 232, 0.18);
+  padding-top: 12px;
+}
+.clock__time {
+  font-size: var(--fs-label);
+  color: var(--n-300);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.clock__txt { font-size: 15px; line-height: 1.7; color: var(--n-200); max-width: 22em; }
+
+.moment__fig { overflow: hidden; }
+.moment__fig svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: scale(1.06);
+  transition: transform 900ms var(--ease-out-expo);
+}
+.moment.is-in .moment__fig svg { transform: scale(1); }
+
+.moment__cap {
+  margin-top: 44px;
+  font-size: var(--fs-label);
+  color: var(--n-300);
+  max-width: 26em;
+  line-height: 1.7;
+}
+
+/* ---- 房间：表格式清单 ---- */
+
+.rooms { display: grid; gap: 0; margin-top: 8px; }
+
+.room {
+  display: grid;
+  grid-template-columns: 3fr 5fr 2fr 2fr;
+  gap: 24px;
+  align-items: baseline;
+  padding: 28px 0;
+  border-top: 1px solid var(--rule);
+}
+.room:last-child { border-bottom: 1px solid var(--rule); }
+.room__name { font-size: 21px; letter-spacing: -0.01em; }
+.room__desc { font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--ink-soft); margin: 0; }
+.room__num { font-size: var(--fs-body-sm); font-variant-numeric: tabular-nums; color: var(--ink-mute); }
+.room__num b { font-weight: 500; color: var(--ink); }
+
+/* ---- 怎么来 ---- */
+
+.way {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+}
+.route { margin: 0; padding: 0; list-style: none; }
+.route li {
+  display: grid;
+  grid-template-columns: 2.5em 1fr;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+}
+.route li:last-child { border-bottom: 1px solid var(--rule); }
+.route .n { color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+
+.way__map svg { display: block; width: 100%; height: auto; }
+
+/* ---- 约定 ---- */
+
+.terms { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; }
+.terms dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 36px 28px;
+  font-size: var(--fs-body);
+  line-height: 1.75;
+}
+.terms dt { color: var(--ink-mute); }
+.terms dd { margin: 0; }
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--n-300);
+  transition: text-decoration-color var(--t-micro) var(--ease-out-quart);
+}
+a:hover { text-decoration-color: currentColor; }
+
+/* ---- closing ---- */
+
+footer.closing { display: grid; align-content: end; background: var(--n-100); }
+.closing .line {
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  max-width: 20em;
+}
+.closing .meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+
+/* ---- 动效（只有一层 reveal + 一个 moment 缩放） ---- */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity var(--t-large) var(--ease-out-quart),
+    transform var(--t-large) var(--ease-out-quart);
+}
+.reveal.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
+.reveal[data-i="1"] { transition-delay: 90ms; }
+.reveal[data-i="2"] { transition-delay: 180ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .moment__fig svg { transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ---- 断点 ---- */
+
+@media (max-width: 1023px) {
+  :root { --gut: 40px; --padt: 88px; --padb: 56px; }
+  .hero .wrap { grid-template-columns: 1fr; gap: 32px; align-items: start; }
+  .hero__fig { order: -1; max-width: 420px; }
+  .hero__facts { grid-template-columns: repeat(3, auto); }
+  .space-grid { grid-template-columns: 1fr; }
+  .fig--wide { grid-row: auto; }
+  .space-note, .way, .terms { grid-template-columns: 1fr; gap: 32px; }
+  .moment .wrap { grid-template-columns: 1fr; gap: 32px; align-content: center; }
+  .room { grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+  .room__desc { grid-column: 1 / -1; }
+}
+
+@media (max-width: 639px) {
+  :root { --gut: 22px; --padt: 80px; --padb: 44px; }
+  .hero__desc { font-size: 17px; }
+  .hero__facts { grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .clock__row { grid-template-columns: 1fr; gap: 4px; }
+  .terms dl { grid-template-columns: 1fr; gap: 4px; }
+  .terms dd { margin-bottom: 14px; }
+  .closing .meta { gap: 8px; flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- 01 hero -->
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <div class="hero__left">
+        <div class="hero__kicker label reveal">
+          <span>浙江 · 丽水</span>
+          <span>海拔 720 米</span>
+          <span>2021 年开业</span>
+        </div>
+        <h1 class="reveal" data-i="1">十七间</h1>
+        <p class="hero__desc reveal" data-i="1">一栋由茶厂仓库改的客房，十七个房间，一条走廊通到头。没有大堂，没有前台，没有早餐厅——钥匙在门上，早饭在走廊尽头的锅里。</p>
+      </div>
+      <div class="hero__fig reveal" data-i="2">
+        <svg viewBox="0 0 420 520" role="img" aria-label="建筑外观示意：长条形二层楼房贴着山坡">
+          <rect width="420" height="520" fill="#e2dfd6"></rect>
+          <rect x="0" y="300" width="420" height="220" fill="#cbc6b8"></rect>
+          <rect x="36" y="196" width="348" height="116" fill="#232019"></rect>
+          <g fill="#f0eee8">
+            <rect x="56" y="216" width="52" height="76"></rect>
+            <rect x="124" y="216" width="52" height="76"></rect>
+            <rect x="192" y="216" width="52" height="76"></rect>
+            <rect x="260" y="216" width="52" height="76"></rect>
+            <rect x="328" y="216" width="36" height="76"></rect>
+          </g>
+          <rect x="36" y="188" width="348" height="8" fill="#7a5c2e"></rect>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 空间 -->
+  <section class="space" id="space">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>这栋楼原来是什么</h2>
+        <span class="label">01 / 空间</span>
+      </div>
+      <div class="space-grid">
+        <figure class="fig fig--wide reveal">
+          <svg viewBox="0 0 700 560" role="img" aria-label="走廊透视示意：一侧连续的窗，尽头一扇门">
+            <rect width="700" height="560" fill="#f0eee8"></rect>
+            <polygon points="0,0 700,0 480,120 220,120" fill="#f8f7f4"></polygon>
+            <polygon points="0,560 700,560 480,440 220,440" fill="#e2dfd6"></polygon>
+            <polygon points="0,0 220,120 220,440 0,560" fill="#e2dfd6"></polygon>
+            <polygon points="700,0 480,120 480,440 700,560" fill="#cbc6b8"></polygon>
+            <rect x="220" y="120" width="260" height="320" fill="#232019"></rect>
+            <rect x="262" y="180" width="176" height="200" fill="#7a5c2e" opacity="0.35"></rect>
+            <g fill="#f8f7f4">
+              <polygon points="0,180 58,206 58,286 0,320"></polygon>
+              <polygon points="0,360 58,322 58,402 0,440"></polygon>
+            </g>
+          </svg>
+          <figcaption>二层走廊，靠山一侧开了七扇窗，窗台高 900 毫米，坐下刚好把胳膊搭上去。</figcaption>
+        </figure>
+        <figure class="fig reveal" data-i="1">
+          <svg viewBox="0 0 520 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="房间内示意：床与窗的关系">
+            <rect width="520" height="300" fill="#f8f7f4"></rect>
+            <rect x="300" y="40" width="180" height="220" fill="#e2dfd6"></rect>
+            <rect x="316" y="56" width="148" height="120" fill="#cbc6b8"></rect>
+            <rect x="40" y="150" width="200" height="110" fill="#232019"></rect>
+            <rect x="40" y="142" width="200" height="10" fill="#4c483e"></rect>
+          </svg>
+          <figcaption>十七个房间都是同一个朝向，床对着窗，不看电视墙。</figcaption>
+        </figure>
+        <figure class="fig reveal" data-i="2">
+          <svg viewBox="0 0 520 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="走廊尽头厨房示意">
+            <rect width="520" height="300" fill="#f0eee8"></rect>
+            <rect x="60" y="120" width="400" height="14" fill="#232019"></rect>
+            <rect x="80" y="134" width="80" height="106" fill="#e2dfd6"></rect>
+            <rect x="180" y="134" width="80" height="106" fill="#e2dfd6"></rect>
+            <rect x="340" y="150" width="60" height="90" fill="#7a5c2e" opacity="0.4"></rect>
+          </svg>
+          <figcaption>走廊尽头是公共的灶台，锅在柜子下面，米在左边的缸里。</figcaption>
+        </figure>
+      </div>
+      <div class="space-note">
+        <p class="reveal">2018 年茶厂搬去了隔壁镇，仓库空了三年。我们租下来的时候，屋顶漏了七处，楼板是木头的，走上去有声音——这个声音后来留着了，没有铺地毯。</p>
+        <p class="reveal" data-i="1">改造只做三件事：把南墙的窗从 1.2 米开到 1.8 米；把原来的货运楼梯换成一部宽的；在走廊尽头的灶间加了一扇能开出去的窗。其余的地方能不动就不动，包括墙上的旧编号。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 dealt moment：一天里它怎么变 -->
+  <section class="moment" id="moment">
+    <div class="wrap">
+      <div>
+        <div class="clock">
+          <div class="clock__row">
+            <span class="clock__time">05:40</span>
+            <span class="clock__txt">雾从山谷底下上来，先到二层。走廊的窗全白，什么也看不见，只剩窗台是干的。</span>
+          </div>
+          <div class="clock__row">
+            <span class="clock__time">11:20</span>
+            <span class="clock__txt">太阳到正上方，光是直的。这时候屋子是凉的，因为屋顶加了一层 120 毫米的稻草保温。</span>
+          </div>
+          <div class="clock__row">
+            <span class="clock__time">17:50</span>
+            <span class="clock__txt">光从西边斜进来，走廊地上会有一条一条的影子，是窗框。这条影子大概存在 40 分钟。</span>
+          </div>
+          <div class="clock__row">
+            <span class="clock__time">21:00</span>
+            <span class="clock__txt">山谷里的村子开始亮灯。从二层的窗往下看，是十七个亮点，跟这栋楼的房间数一样。</span>
+          </div>
+        </div>
+        <p class="moment__cap">这些时间点写在走廊的墙上，不是装饰——它们是我们决定把窗开在这里的理由。</p>
+      </div>
+      <div class="moment__fig">
+        <svg viewBox="0 0 720 520" role="img" aria-label="山谷与远处的村子，夜里亮着十七个点">
+          <rect width="720" height="520" fill="#12100b"></rect>
+          <rect x="0" y="0" width="720" height="200" fill="#232019"></rect>
+          <polygon points="0,200 140,120 300,190 460,110 620,180 720,130 720,320 0,320" fill="#1a1710"></polygon>
+          <polygon points="0,320 200,240 420,310 600,250 720,300 720,520 0,520" fill="#0d0b07"></polygon>
+          <g fill="#e8d9a8">
+            <circle cx="180" cy="352" r="2.4"></circle>
+            <circle cx="214" cy="368" r="2.4"></circle>
+            <circle cx="246" cy="346" r="2.4"></circle>
+            <circle cx="272" cy="382" r="2.4"></circle>
+            <circle cx="308" cy="360" r="2.4"></circle>
+            <circle cx="336" cy="392" r="2.4"></circle>
+            <circle cx="368" cy="356" r="2.4"></circle>
+            <circle cx="396" cy="378" r="2.4"></circle>
+            <circle cx="424" cy="348" r="2.4"></circle>
+            <circle cx="452" cy="390" r="2.4"></circle>
+            <circle cx="486" cy="362" r="2.4"></circle>
+            <circle cx="512" cy="384" r="2.4"></circle>
+            <circle cx="540" cy="354" r="2.4"></circle>
+            <circle cx="566" cy="396" r="2.4"></circle>
+            <circle cx="598" cy="370" r="2.4"></circle>
+            <circle cx="624" cy="344" r="2.4"></circle>
+            <circle cx="652" cy="388" r="2.4"></circle>
+          </g>
+          <rect x="0" y="486" width="720" height="1" fill="#4c483e"></rect>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 房间 -->
+  <section class="rooms-sec" id="rooms">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>十七个房间，三种</h2>
+        <span class="label">02 / 住</span>
+      </div>
+      <div class="rooms">
+        <div class="room reveal">
+          <div class="room__name">靠山</div>
+          <p class="room__desc">朝北，看后面那片竹林，看不到村子。窗下有一个 1.4 米长的木台，可以摊开电脑或者躺着。共 9 间。</p>
+          <div class="room__num">28 ㎡</div>
+          <div class="room__num"><b>¥ 620</b> / 晚</div>
+        </div>
+        <div class="room reveal" data-i="1">
+          <div class="room__name">朝谷</div>
+          <p class="room__desc">朝南，整面墙开窗，能看到山谷和对面的村子。冬天下午屋里会暖，夏天要拉竹帘。共 6 间。</p>
+          <div class="room__num">31 ㎡</div>
+          <div class="room__num"><b>¥ 760</b> / 晚</div>
+        </div>
+        <div class="room reveal" data-i="2">
+          <div class="room__name">尽头两间</div>
+          <p class="room__desc">走廊最里面的两间，原来放茶叶的隔间，层高比别的房间低 40 厘米。带一个只有这两间能用的露台。</p>
+          <div class="room__num">36 ㎡</div>
+          <div class="room__num"><b>¥ 980</b> / 晚</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 怎么来 -->
+  <section class="way-sec" id="way">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>怎么上来</h2>
+        <span class="label">03 / 到达</span>
+      </div>
+      <div class="way">
+        <ol class="route reveal">
+          <li><span class="n">01</span><span>高铁到丽水站，出站右手边是汽车站，坐 302 路到「大港头」下，票价 9 元，约 55 分钟。</span></li>
+          <li><span class="n">02</span><span>下车后沿溪走 400 米到石桥，桥头有一块写着「十七间」的木牌，字是竖着刻的。</span></li>
+          <li><span class="n">03</span><span>过桥后上山，一条水泥路，走 12 分钟。最后 200 米是台阶，车开不上来。</span></li>
+          <li><span class="n">04</span><span>自驾的话停在山下的村委会院子，晚上会锁门，需要提前打招呼。</span></li>
+        </ol>
+        <div class="way__map reveal" data-i="1">
+          <svg viewBox="0 0 620 420" role="img" aria-label="到达路线示意：从溪边石桥到半山建筑">
+            <rect width="620" height="420" fill="#f0eee8"></rect>
+            <path d="M0 330 Q 160 300 300 340 T 620 300" stroke="#cbc6b8" stroke-width="26" fill="none"></path>
+            <path d="M0 330 Q 160 300 300 340 T 620 300" stroke="#f8f7f4" stroke-width="16" fill="none"></path>
+            <rect x="286" y="316" width="42" height="14" fill="#4c483e"></rect>
+            <path d="M306 316 L 360 200 L 420 170" stroke="#7a5c2e" stroke-width="3" stroke-dasharray="8 6" fill="none"></path>
+            <rect x="404" y="150" width="76" height="30" fill="#232019"></rect>
+            <circle cx="306" cy="322" r="6" fill="#7a5c2e"></circle>
+            <text x="290" y="356" font-size="12" fill="#4c483e" font-family="sans-serif">石桥 / 下车点</text>
+            <text x="404" y="200" font-size="12" fill="#4c483e" font-family="sans-serif">十七间 · 海拔 720m</text>
+          </svg>
+          <figcaption>从石桥到门口 12 分钟，全程上坡，提大箱子的建议让店里下来接。</figcaption>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 约定 -->
+  <section class="terms-sec" id="terms">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>几件事先说清楚</h2>
+        <span class="label">04 / 约定</span>
+      </div>
+      <div class="terms">
+        <p class="reveal">这里没有服务员。入住当天下午三点后钥匙在门上，退房把钥匙留在门里，门带上就行。有事打走廊墙上写的那个号码，接电话的是我们自己。</p>
+        <dl class="reveal" data-i="1">
+          <dt>入住 / 退房</dt>
+          <dd>15:00 之后 / 12:00 之前。早到可以把包放在灶间</dd>
+          <dt>早饭</dt>
+          <dd>7:30–9:30，粥、鸡蛋、自己腌的菜。不做午晚饭</dd>
+          <dt>带小孩</dt>
+          <dd>可以。楼梯没有护栏，二层走廊要注意</dd>
+          <dt>宠物</dt>
+          <dd>可以，不上床，走廊要牵绳</dd>
+          <dt>没有的</dt>
+          <dd>电视、空调、电梯、Wi-Fi 密码墙（密码是八个 8）</dd>
+          <dt>取消</dt>
+          <dd>提前 7 天全退，3 天内退一半，当天不退</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="closing">
+  <div class="wrap">
+    <p class="line reveal">十七个房间，<br>一栋楼，一条走廊。</p>
+    <div class="meta reveal" data-i="1">
+      <span class="label">浙江丽水 · 大港头</span>
+      <span class="label">订房：<a href="mailto:stay@shiqi-jian.example">stay@shiqi-jian.example</a></span>
+      <span class="label">本页信息更新于 2026 年 10 月</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (!entries[i].isIntersecting) continue;
+      entries[i].target.classList.add('is-in');
+      io.unobserve(entries[i].target);
+    }
+  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+  document.querySelectorAll('.reveal, .moment').forEach(function (el) {
+    io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>南山一间 · 只做建筑照明的一件事</title>
+<style>
+/* ===========================================================
+   01-editorial · 品牌 / 工作室 / 观点长页
+   五节 + closing。一个 dealt moment（type-mask）。
+   数值全部落在 tokens.json 的 editorial 预设附近。
+   这份模板只用 assets/taste-base.css 的同一套变量，改动请同步。
+   =========================================================== */
+
+:root {
+  --u: 8px;
+  --wrap: 1200px;
+  --gut: 80px;
+  --padt: 120px;
+  --padb: 72px;
+
+  --n-0: #ffffff;
+  --n-50: #fafaf9;
+  --n-100: #f4f4f2;
+  --n-200: #e7e6e2;
+  --n-300: #d2d0ca;
+  --n-500: #8a8781;
+  --n-700: #4a4740;
+  --n-900: #1a1815;
+  --n-1000: #0d0c0a;
+
+  --g-main: var(--n-0);
+  --g-alt: var(--n-50);
+  --g-dark: var(--n-1000);
+  --ink: var(--n-900);
+  --ink-soft: var(--n-700);
+  --ink-mute: var(--n-500);
+  --rule: var(--n-200);
+  --accent: #b4451f;
+
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-serif: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC",
+    "SimSun", Georgia, serif;
+
+  --fs-body: 17px;
+  --fs-body-sm: 15px;
+  --fs-label: 13px;
+  --fs-h3: 21px;
+  --fs-h2: 32px;
+  --lh-body: 1.8;
+  --lh-body-sm: 1.75;
+  --lh-h3: 1.6;
+  --lh-h2: 1.3;
+  --measure: 32em;
+
+  --r-1: 2px;
+  --e1: 0 1px 2px rgba(20, 18, 15, 0.06);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-micro: 120ms;
+  --t-small: 240ms;
+  --t-large: 650ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--g-main);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 500; text-wrap: balance; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; line-break: strict; }
+p:last-child { margin-bottom: 0; }
+
+main > section, footer.closing {
+  height: calc(var(--h, 1) * 100svh);
+  display: grid;
+  align-content: start;
+  padding-top: var(--padt);
+  padding-bottom: var(--padb);
+  position: relative;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+/* ---- hero ---- */
+
+.hero h1 {
+  font-size: clamp(44px, 7.2vw, 84px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  max-width: 14em;
+}
+
+.hero__sub {
+  margin-top: 32px;
+  font-size: 21px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 26em;
+}
+
+.hero__foot {
+  position: absolute;
+  left: var(--gut);
+  right: var(--gut);
+  bottom: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+  padding-inline: calc((100% - var(--wrap)) / 2 + var(--gut));
+  max-width: 100%;
+}
+
+.meta-line {
+  display: flex;
+  gap: 24px;
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+}
+
+/* ---- 节头 ---- */
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.sec-no {
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); }
+
+h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+
+/* ---- 观点节 ---- */
+
+.view .body {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.view .body p { max-width: 30em; }
+
+.pull {
+  border-left: 2px solid var(--accent);
+  padding-left: 24px;
+  font-size: 26px;
+  line-height: 1.55;
+  max-width: 20em;
+}
+
+/* ---- dealt moment：type-mask ---- */
+
+.moment {
+  background: var(--g-dark);
+  color: var(--n-100);
+  --h: 2;
+}
+
+.moment__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  align-content: center;
+  padding-inline: var(--gut);
+}
+
+.mask-win { overflow: hidden; }
+
+.mask-line {
+  display: block;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  transform: translate3d(0, 104%, 0);
+  transition: transform 650ms var(--ease-out-expo);
+}
+
+.moment.is-in .mask-line { transform: translate3d(0, 0, 0); }
+.moment.is-in .mask-line[data-i="1"] { transition-delay: 90ms; }
+.moment.is-in .mask-line[data-i="2"] { transition-delay: 180ms; }
+
+.moment__note {
+  margin-top: 40px;
+  color: var(--n-300);
+  font-size: var(--fs-body-sm);
+  max-width: 26em;
+}
+
+/* ---- 作品节 ---- */
+
+.work-grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.work-item svg { display: block; width: 100%; height: auto; }
+
+.work-item h3 { margin-top: 16px; font-size: var(--fs-body); font-weight: 500; }
+
+.work-item .small {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+  color: var(--ink-mute);
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 联系节 ---- */
+
+.contact dl {
+  margin: 72px 0 0;
+  display: grid;
+  grid-template-columns: 8em 1fr;
+  gap: 34px 32px;
+  max-width: 44em;
+  font-size: var(--fs-body);
+  line-height: 1.75;
+}
+
+.contact dt { color: var(--ink-mute); }
+.contact dd { margin: 0; }
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--n-300);
+  transition: text-decoration-color var(--t-micro) var(--ease-out-quart);
+}
+a:hover { text-decoration-color: currentColor; }
+
+/* ---- closing ---- */
+
+footer.closing {
+  display: grid;
+  align-content: end;
+  padding-bottom: 72px;
+}
+
+.closing .sig {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  max-width: 18em;
+}
+
+.closing .tiny {
+  margin-top: 24px;
+  font-size: var(--fs-label);
+  color: var(--ink-mute);
+}
+
+/* ---- 动效 ---- */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity var(--t-large) var(--ease-out-quart),
+    transform var(--t-large) var(--ease-out-quart);
+}
+.reveal.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
+.reveal[data-i="1"] { transition-delay: 90ms; }
+.reveal[data-i="2"] { transition-delay: 180ms; }
+
+/* ---- 降级 ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .mask-line {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ---- 断点 ---- */
+
+@media (max-width: 1023px) {
+  :root { --gut: 40px; --padt: 104px; --padb: 64px; }
+  .view .body { grid-template-columns: 1fr; gap: 32px; }
+  .work-grid { grid-template-columns: 1fr 1fr; }
+  .hero__foot { padding-inline: var(--gut); }
+}
+
+@media (max-width: 639px) {
+  :root { --gut: 24px; --padt: 96px; --padb: 48px; }
+  .work-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero__sub { font-size: 18px; margin-top: 24px; }
+  .pull { font-size: 21px; }
+  .contact dl { grid-template-columns: 1fr; gap: 8px; }
+  .contact dd { margin-bottom: 16px; }
+  .hero__foot { flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- 01 hero：谁 + 做什么 + 三个可核对的坐标 -->
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <h1 class="reveal">我们把一间仓库的窗，<br>改成了会随时间变色的一层膜。</h1>
+      <p class="hero__sub reveal" data-i="1">南山一间，2016 年在深圳南山区开的两张桌子。只做一件事：建筑立面的照明与遮光，从设计到验收，一年最多接六个项目。</p>
+    </div>
+    <div class="hero__foot reveal" data-i="2">
+      <span>南山一间 · 建筑照明工作室</span>
+      <span class="meta-line">
+        <span>深圳 · 南山区</span>
+        <span>2016 年起</span>
+        <span>累计 41 个项目</span>
+      </span>
+    </div>
+  </section>
+
+  <!-- 02 观点：为什么只做一件事 -->
+  <section class="view" id="view">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">01</span>
+        <h2>为什么不接别的</h2>
+      </div>
+      <div class="body">
+        <p class="pull">一个立面的光，白天看是反射率，晚上看是色温，中间那三小时看的是电费单。</p>
+        <div>
+          <p>2016 年第一次去现场，业主给我们看的是效果图。我们量了三天，量的是对面那栋楼的玻璃幕墙在下午四点半把太阳反射到哪一行窗上——效果图上没有这个东西，但它决定了这栋楼晚上要不要开灯。</p>
+          <p>后来这个习惯留下来了：每个项目开工前，先去现场站满一个下午，记录日照角度、周边反射面、人流转弯的位置。三样东西记完，方案通常已经改了一半。</p>
+          <p>我们不做室内、不做景观、不做泛光。不是因为不想，是因为这三种活的工作节奏和验收标准跟立面照明完全不同：室内看的是显色指数，景观看的是层次，立面看的是连续六个小时的稳定性。一年做六件事，每一件都得能撑住一整个季度的复检。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 dealt moment：type-mask，全页唯一 -->
+  <section class="moment" id="moment">
+    <div class="moment__pin">
+      <div class="mask-win">
+        <span class="mask-line" data-i="0">白天的立面</span>
+        <span class="mask-line" data-i="1">是材料的事。</span>
+        <span class="mask-line" data-i="2">晚上的立面，是电的事。</span>
+      </div>
+      <p class="moment__note">这栋楼在夜里每小时耗 18.4 度电，其中 11.2 度来自立面照明。我们把灯具数量从 386 支减到 214 支，照度没有下降，因为原来有 40% 的光打在墙上没进到人眼里。</p>
+    </div>
+  </section>
+
+  <!-- 04 作品：三个，每个一行可核对的信息 -->
+  <section class="work" id="work">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">02</span>
+        <h2>做过什么</h2>
+      </div>
+      <div class="work-grid">
+        <div class="work-item">
+          <svg viewBox="0 0 400 300" role="img" aria-label="仓库改造项目立面示意图">
+            <rect width="400" height="300" fill="#e7e6e2"></rect>
+            <rect x="40" y="60" width="320" height="180" fill="#1a1815"></rect>
+            <g fill="#f4f4f2">
+              <rect x="60" y="84" width="56" height="36"></rect>
+              <rect x="128" y="84" width="56" height="36"></rect>
+              <rect x="196" y="84" width="56" height="36"></rect>
+              <rect x="264" y="84" width="56" height="36"></rect>
+              <rect x="60" y="140" width="56" height="36"></rect>
+              <rect x="128" y="140" width="56" height="36"></rect>
+              <rect x="196" y="140" width="56" height="36"></rect>
+              <rect x="264" y="140" width="56" height="36"></rect>
+            </g>
+            <rect x="40" y="240" width="320" height="2" fill="#b4451f"></rect>
+          </svg>
+          <h3>蛇口仓库改造 · 立面膜</h3>
+          <div class="small">2024 · 4,200 ㎡ · 灯具 214 支</div>
+        </div>
+        <div class="work-item">
+          <svg viewBox="0 0 400 300" role="img" aria-label="中学教学楼项目立面示意图">
+            <rect width="400" height="300" fill="#f4f4f2"></rect>
+            <rect x="40" y="90" width="150" height="150" fill="#d2d0ca"></rect>
+            <rect x="210" y="60" width="150" height="180" fill="#1a1815"></rect>
+            <g fill="#f4f4f2">
+              <rect x="224" y="80" width="122" height="4"></rect>
+              <rect x="224" y="104" width="122" height="4"></rect>
+              <rect x="224" y="128" width="122" height="4"></rect>
+              <rect x="224" y="152" width="122" height="4"></rect>
+              <rect x="224" y="176" width="122" height="4"></rect>
+              <rect x="224" y="200" width="122" height="4"></rect>
+            </g>
+            <rect x="40" y="240" width="320" height="2" fill="#b4451f"></rect>
+          </svg>
+          <h3>龙华某中学教学楼 · 遮光</h3>
+          <div class="small">2023 · 9,600 ㎡ · 教室眩光投诉归零</div>
+        </div>
+        <div class="work-item">
+          <svg viewBox="0 0 400 300" role="img" aria-label="小型美术馆夜景照明示意图">
+            <rect width="400" height="300" fill="#1a1815"></rect>
+            <circle cx="200" cy="150" r="64" fill="#4a4740"></circle>
+            <circle cx="200" cy="150" r="40" fill="#e7e6e2"></circle>
+            <rect x="40" y="240" width="320" height="2" fill="#b4451f"></rect>
+          </svg>
+          <h3>光明区美术馆 · 夜间主立面</h3>
+          <div class="small">2025 · 2,100 ㎡ · 色温 2700K 全程</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 联系：谁能找到、怎么找到、什么时候在 -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">03</span>
+        <h2>怎么找我们</h2>
+      </div>
+      <dl>
+        <dt>地址</dt>
+        <dd>深圳市南山区兴华路 6 号 3 楼 301，楼梯上来右手第一扇门</dd>
+        <dt>在的时间</dt>
+        <dd>周一到周五 10:00–18:00。周四下午全体去现场，通常不在</dd>
+        <dt>项目咨询</dt>
+        <dd>先发一张立面照片和一个大概面积，我们两天内回是否接</dd>
+        <dt>邮件</dt>
+        <dd><a href="mailto:studio@nanshan-yijian.example">studio@nanshan-yijian.example</a></dd>
+        <dt>不接的</dt>
+        <dd>纯效果图项目、三个月内要验收的项目、只做节日灯光秀的项目</dd>
+      </dl>
+    </div>
+  </section>
+
+</main>
+
+<footer class="closing">
+  <div class="wrap">
+    <p class="sig reveal">一年六个项目，<br>做完都还在用。</p>
+    <p class="tiny reveal" data-i="1">南山一间 · 建筑照明工作室 · 深圳南山区 · 本页最后修改于 2026 年 11 月</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (!entries[i].isIntersecting) continue;
+      entries[i].target.classList.add('is-in');
+      io.unobserve(entries[i].target);
+    }
+  }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
+
+  document.querySelectorAll('.reveal, .moment').forEach(function (el) {
+    io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>

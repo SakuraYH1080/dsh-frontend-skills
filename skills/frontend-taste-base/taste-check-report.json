@@ -1,0 +1,171 @@
+{
+  "files": [
+    "templates/02-place.html"
+  ],
+  "counts": {
+    "PASS": 24,
+    "FAIL": 0,
+    "OPEN": 1,
+    "SETUP": 0,
+    "ERROR": 0,
+    "OFF": 1
+  },
+  "results": [
+    {
+      "group": "结构",
+      "id": "02-place.html:sections",
+      "state": "PASS",
+      "detail": "节数 6（5–6）"
+    },
+    {
+      "group": "结构",
+      "id": "02-place.html:--h",
+      "state": "PASS",
+      "detail": "--h 取值 2 全部合法"
+    },
+    {
+      "group": "结构",
+      "id": "02-place.html:min-height",
+      "state": "PASS",
+      "detail": "未用 min-height 撑节"
+    },
+    {
+      "group": "结构",
+      "id": "02-place.html:viewport-unit",
+      "state": "PASS",
+      "detail": "未用 100vh / 100dvh"
+    },
+    {
+      "group": "结构",
+      "id": "02-place.html:cards",
+      "state": "PASS",
+      "detail": "疑似卡片化元素 0 个（启发式，需人眼复核）"
+    },
+    {
+      "group": "结构",
+      "id": "02-place.html:dividers",
+      "state": "OPEN",
+      "detail": "出现 4 条 border-top：确认是否被当节分隔线用（禁止）"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:easing",
+      "state": "PASS",
+      "detail": "2 条曲线控制点 y 全在 [0,1]"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:transition-prop",
+      "state": "PASS",
+      "detail": "过渡属性均为 transform / opacity 类"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:will-change",
+      "state": "PASS",
+      "detail": "will-change 未加在 body / html"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:scroll-layout",
+      "state": "PASS",
+      "detail": "无 scroll 监听"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:reduced-motion",
+      "state": "PASS",
+      "detail": "已处理 prefers-reduced-motion"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:scroll-hijack",
+      "state": "PASS",
+      "detail": "无滚动劫持"
+    },
+    {
+      "group": "动效",
+      "id": "02-place.html:moment",
+      "state": "PASS",
+      "detail": "dealt moment 恰好 1 个"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:body-size",
+      "state": "PASS",
+      "detail": "正文字号 17px（下限 16）"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:body-lh",
+      "state": "PASS",
+      "detail": "正文行高 1.8（下限 1.7）"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:measure",
+      "state": "PASS",
+      "detail": "行宽 30em（要求 28–40）"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:italic",
+      "state": "PASS",
+      "detail": "无 font-style: italic"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:tracking-cjk",
+      "state": "PASS",
+      "detail": "标题未加正字距"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:kin-soku",
+      "state": "PASS",
+      "detail": "已设 line-break: strict"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:font-stack",
+      "state": "PASS",
+      "detail": "字体栈含 Microsoft YaHei"
+    },
+    {
+      "group": "排版",
+      "id": "02-place.html:tabular-nums",
+      "state": "OFF",
+      "detail": "无表格，跳过"
+    },
+    {
+      "group": "文案",
+      "id": "02-place.html:ban-words",
+      "state": "PASS",
+      "detail": "未命中禁用词表"
+    },
+    {
+      "group": "文案",
+      "id": "02-place.html:fullwidth-punct",
+      "state": "PASS",
+      "detail": "未发现中文夹半角标点"
+    },
+    {
+      "group": "基础",
+      "id": "02-place.html:viewport",
+      "state": "PASS",
+      "detail": "有 viewport meta"
+    },
+    {
+      "group": "基础",
+      "id": "02-place.html:external",
+      "state": "PASS",
+      "detail": "无外链资源"
+    },
+    {
+      "group": "基础",
+      "id": "02-place.html:lang",
+      "state": "PASS",
+      "detail": "html lang 为中文"
+    }
+  ]
+}

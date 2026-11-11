@@ -1,0 +1,4 @@
+interface:
+  display_name: "前端整体设计"
+  short_description: "从真实任务和内容定整站设计方向，按职责分配排版、材质、角色、动效专项，并给出可复跑的验收。"
+  default_prompt: "用 $frontend-design-direction 为这个整页/整站定设计方向：先写任务句和内容表，再定标题、列表、详情的分工，选主导视觉语言和一处识别细节，列出各专项负责的决定，最后用同一条用户任务验收。"

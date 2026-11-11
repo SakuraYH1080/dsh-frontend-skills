@@ -1,0 +1,12 @@
+display_name: 通用品味基线
+short_description: 一页分几节、每节多高、什么能动、文案像不像 AI 写的。补在风格化 skill 之下的骨架层。
+brand_color: "#1A1815"
+default_prompt: >-
+  先用 frontend-taste-base 定骨架：判断产物属于 software / gaming / tech / product / service / place 哪一档，
+  列出 5–6 节清单（每节一句可反驳的主张），逐条估高后查内容窗口表把节高定成 --h:1 或 --h:2，
+  落在 708–1320 非法带的内容必须砍或拆。然后写 main > section + footer.closing，
+  每节 height: calc(var(--h,1) * 100svh) 且 align-content: start。
+  动效只留三层：hero 入场一次、一个 dealt moment 独占其节、hover 层；曲线只用 ease-out 家族，不许过冲。
+  文案先列事实（数字、地点、价格、日期）再组句，每节标题必须有一个名词指向实物。
+  最后跑 node assets/taste-check.mjs index.html 按输出逐条修。
+  中文正文 ≥ 16px、行高 1.7–1.9、行宽 28–40 字、全角标点、避头尾。

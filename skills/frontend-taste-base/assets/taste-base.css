@@ -1,0 +1,541 @@
+/* ==========================================================================
+   frontend-taste-base · 基础样式
+   唯一数值真源是 assets/tokens.json。改数值先改 tokens，再回来改这里。
+   这份文件只提供骨架：节盒子 / 排版 / 栅格 / 动效三层 / 深色节。
+   它不做任何装饰。你要的风格由兄弟 skill 负责。
+   ========================================================================== */
+
+/* ---------- 1. tokens 落到 CSS 变量 ---------- */
+
+:root {
+  /* 网格 */
+  --u: 8px;
+  --gap-1: 8px;
+  --gap-2: 16px;
+  --gap-3: 24px;
+  --gap-4: 32px;
+  --gap-5: 48px;
+
+  /* 容器与留白 */
+  --wrap: 1200px;
+  --gut: 80px;
+  --padt: 120px;
+  --padb: 72px;
+
+  /* 颜色：中性九档，强调色由页面自己指定 */
+  --n-0: #ffffff;
+  --n-50: #fafaf9;
+  --n-100: #f4f4f2;
+  --n-200: #e7e6e2;
+  --n-300: #d2d0ca;
+  --n-500: #8a8781;
+  --n-700: #4a4740;
+  --n-900: #1a1815;
+  --n-1000: #0d0c0a;
+
+  --g-main: var(--n-0);
+  --g-alt: var(--n-50);
+  --g-dark: var(--n-1000);
+
+  --ink: var(--n-900);
+  --ink-soft: var(--n-700);
+  --ink-mute: var(--n-500);
+  --rule: var(--n-200);
+
+  /* 强调色：默认给一个，页面必须覆盖成自己的 */
+  --accent: #0a6cff;
+
+  /* 字体 */
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-serif: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC",
+    "SimSun", Georgia, serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas,
+    "Sarasa Mono SC", monospace;
+
+  /* 字号 */
+  --fs-body: 17px;
+  --fs-body-sm: 15px;
+  --fs-label: 13px;
+  --fs-h3: 21px;
+  --fs-h2: 32px;
+  --fs-h1: 52px;
+  --fs-hero: 72px;
+
+  /* 行高 */
+  --lh-body: 1.8;
+  --lh-body-sm: 1.75;
+  --lh-h3: 1.6;
+  --lh-h2: 1.3;
+  --lh-h1: 1.2;
+  --lh-hero: 1.12;
+  --lh-label: 1.5;
+
+  /* 字距 */
+  --tr-hero: -0.02em;
+  --tr-h1: -0.01em;
+  --tr-caps: 0.14em;
+
+  /* 行宽 */
+  --measure: 34em;
+
+  /* 圆角与投影 */
+  --r-0: 0;
+  --r-1: 2px;
+  --r-2: 8px;
+  --r-3: 16px;
+  --e1: 0 1px 2px rgba(20, 18, 15, 0.06);
+  --e2: 0 12px 32px -8px rgba(20, 18, 15, 0.14);
+
+  /* 动效 */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quad: cubic-bezier(0.45, 0, 0.55, 1);
+  --t-micro: 120ms;
+  --t-small: 240ms;
+  --t-mid: 400ms;
+  --t-large: 650ms;
+}
+
+/* ---------- 2. 重置（只做必需的那几件） ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--g-main);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* 焦点环：不要 outline: none */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ---------- 3. 节盒子：整页节奏的唯一来源 ---------- */
+
+main > section,
+footer.closing {
+  height: calc(var(--h, 1) * 100svh);
+  display: grid;
+  align-content: start;
+  padding-top: var(--padt);
+  padding-bottom: var(--padb);
+  position: relative;
+}
+
+/* 每节恰好一个 h2，且是首元素 */
+main > section > h2:first-child,
+main > section > .sec-head:first-child {
+  margin-top: 0;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+/* 出血：图到视口边 */
+.bleed {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  max-width: none;
+}
+
+/* ---------- 4. 排版 ---------- */
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  letter-spacing: var(--tr-h1);
+}
+
+.hero__title {
+  font-size: clamp(40px, 6vw, var(--fs-hero));
+  line-height: var(--lh-hero);
+  letter-spacing: var(--tr-hero);
+  font-weight: 500;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  font-weight: 500;
+}
+
+p {
+  margin: 0 0 var(--gap-2);
+  max-width: var(--measure);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.lead {
+  font-size: 21px;
+  line-height: 1.7;
+  max-width: 30em;
+  color: var(--ink-soft);
+}
+
+.small,
+figcaption,
+.meta {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+  color: var(--ink-mute);
+}
+
+.label {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-mute);
+}
+
+/* 全大写英文标签才加字距；中文永远不加 */
+.caps {
+  text-transform: uppercase;
+  letter-spacing: var(--tr-caps);
+  font-size: var(--fs-label);
+  font-weight: 500;
+}
+
+/* 中文排版三件套 */
+.prose {
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+  max-width: var(--measure);
+}
+
+/* 中文强调用字重与左竖线，不用斜体 */
+em,
+i {
+  font-style: normal;
+  font-weight: 500;
+}
+
+.mark {
+  border-left: 2px solid var(--accent);
+  padding-left: var(--gap-2);
+}
+
+/* 数字列对齐 */
+table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+/* 链接：下划线而不是变色 */
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--n-300);
+  transition: text-decoration-color var(--t-micro) var(--ease-in-out-quad);
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---------- 5. 栅格：两种，不要更多 ---------- */
+
+.g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-5);
+}
+
+.g3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-4);
+}
+
+.stack {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-3);
+}
+
+.stack-l {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-5);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: var(--gap-5);
+  align-items: start;
+}
+
+/* ---------- 6. 深色节与整幅底色切换 ---------- */
+
+.alt {
+  background: var(--g-alt);
+}
+
+.dark {
+  background: var(--g-dark);
+  color: var(--n-100);
+}
+
+.dark .lead,
+.dark .small,
+.dark figcaption,
+.dark .label {
+  color: var(--n-300);
+}
+
+.dark a {
+  text-decoration-color: var(--n-700);
+}
+
+/* ---------- 7. 动效：三层，一条都不多做 ---------- */
+
+/* 入场层：只在 hero，一次 */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity var(--t-large) var(--ease-out-quart),
+    transform var(--t-large) var(--ease-out-quart);
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* 错开：最多 6 个，间隔 90–120ms */
+.reveal[data-i="1"] { transition-delay: 90ms; }
+.reveal[data-i="2"] { transition-delay: 180ms; }
+.reveal[data-i="3"] { transition-delay: 270ms; }
+.reveal[data-i="4"] { transition-delay: 360ms; }
+.reveal[data-i="5"] { transition-delay: 450ms; }
+
+/* dealt moment：每页只给一节 */
+.moment {
+  position: relative;
+}
+
+.moment__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  align-content: center;
+}
+
+/* type-mask：大字被容器遮住 */
+.moment--mask .mask-win {
+  overflow: hidden;
+}
+
+.moment--mask .mask-line {
+  transform: translate3d(0, 104%, 0);
+  transition: transform var(--t-large) var(--ease-out-expo);
+}
+
+.moment--mask.is-in .mask-line {
+  transform: translate3d(0, 0, 0);
+}
+
+/* scroll-zoom：图在节内放大 */
+.moment--zoom .zoom-img {
+  transform: scale(1);
+  transition: transform 1.2s var(--ease-out-expo);
+  will-change: transform;
+}
+
+.moment--zoom.is-in .zoom-img {
+  transform: scale(1.08);
+}
+
+/* clip-reveal */
+.moment--clip .clip-box {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 900ms var(--ease-out-expo);
+}
+
+.moment--clip.is-in .clip-box {
+  clip-path: inset(0 0 0 0);
+}
+
+/* hover 层：每个元素只做一件事 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-1);
+  min-height: 48px;
+  padding-inline: var(--gap-3);
+  border: 1px solid currentColor;
+  border-radius: var(--r-1);
+  background: transparent;
+  font-size: var(--fs-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform var(--t-small) var(--ease-out-quart),
+    background-color var(--t-small) var(--ease-in-out-quad);
+}
+
+.btn:hover {
+  transform: translate3d(0, -1px, 0);
+}
+
+.btn--solid {
+  background: var(--ink);
+  color: var(--n-0);
+  border-color: var(--ink);
+}
+
+.dark .btn--solid {
+  background: var(--n-100);
+  color: var(--g-dark);
+  border-color: var(--n-100);
+}
+
+/* ---------- 8. 降级：换成静态终态，不是关掉 ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .moment--mask .mask-line,
+  .moment--clip .clip-box,
+  .moment--zoom .zoom-img {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- 9. 响应：三断点，两个变量 ---------- */
+
+@media (max-width: 1023px) {
+  :root {
+    --gut: 40px;
+    --padt: 104px;
+    --padb: 64px;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .g3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  :root {
+    --gut: 24px;
+    --padt: 96px;
+    --padb: 48px;
+    --fs-body: 17px;      /* 不再往下调 */
+    --fs-h1: 34px;
+    --fs-h2: 26px;
+  }
+
+  .g2,
+  .g3 {
+    grid-template-columns: 1fr;
+    gap: var(--gap-4);
+  }
+
+  .lead {
+    font-size: 18px;
+  }
+
+  .hero__title {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+}
+
+/* ---------- 10. 打印 ---------- */
+
+@media print {
+  main > section {
+    height: auto;
+    page-break-after: always;
+  }
+
+  .reveal,
+  .moment--mask .mask-line,
+  .moment--clip .clip-box {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}
